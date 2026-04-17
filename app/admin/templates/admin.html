@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Lash Studio - Админ панель</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fb; padding: 20px; }
+        .header { margin-bottom: 20px; }
+        h1 { color: #1a1a2e; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { padding: 12px 24px; background: white; border-radius: 10px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .tab:hover { background: #e9ecef; }
+        .tab.active { background: #4CAF50; color: white; }
+        .tab-content { display: none; background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .tab-content.active { display: block; }
+        .calendar-container { background: white; border-radius: 12px; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e9ecef; }
+        .calendar-nav button { background: #e94560; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; margin: 0 3px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .calendar-weekday { text-align: center; padding: 12px; font-weight: bold; background: #f8f9fa; border-radius: 8px; }
+        .calendar-day { background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 10px; min-height: 130px; transition: 0.2s; }
+        .calendar-day.off { background: #fff0f0; border-color: #ffcdd2; }
+        .calendar-day.today { background: #e3f2fd; border-color: #2196f3; }
+        .day-number { font-weight: bold; font-size: 16px; margin-bottom: 8px; }
+        .booking-item { background: #e3f2fd; padding: 4px 8px; margin: 4px 0; border-radius: 6px; font-size: 11px; cursor: pointer; display: flex; justify-content: space-between; }
+        .booking-item:hover { background: #bbdef5; }
+        .booking-item.confirmed { background: #c8e6c9; }
+        .booking-item.cancelled { background: #ffcdd2; }
+        .booking-time { font-weight: bold; }
+        .day-actions { margin-top: 8px; display: flex; gap: 5px; justify-content: center; }
+        .btn-day-off, .btn-hours { padding: 4px 8px; font-size: 10px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-day-off { background: #ff9800; color: white; }
+        .btn-hours { background: #2196f3; color: white; }
+        .bookings-table { width: 100%; border-collapse: collapse; }
+        .bookings-table th, .bookings-table td { padding: 12px; text-align: left; border-bottom: 1px solid #e9ecef; }
+        .bookings-table th { background: #f8f9fa; font-weight: 600; }
+        .status-pending { color: #ff9800; font-weight: bold; }
+        .status-confirmed { color: #4caf50; font-weight: bold; }
+        .status-cancelled { color: #f44336; font-weight: bold; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .btn-primary { background: #4caf50; color: white; }
+        .btn-danger { background: #f44336; color: white; }
+        .btn-warning { background: #ff9800; color: white; }
+        .btn-sm { padding: 4px 8px; font-size: 12px; }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border-radius: 15px; z-index: 1000; width: 450px; max-width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+        .success-msg { background: #d4edda; color: #155724; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; }
+        .price-row { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .price-row input { width: 120px; padding: 8px; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .gallery-item { position: relative; border-radius: 10px; overflow: hidden; background: #f8f9fa; border: 1px solid #e9ecef; }
+        .gallery-item img { width: 100%; height: 150px; object-fit: cover; }
+        .gallery-item p { padding: 8px; font-size: 12px; text-align: center; }
+        .delete-img { position: absolute; top: 5px; right: 5px; background: #f44336; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; }
+        .upload-area { border: 2px dashed #ddd; border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 20px; cursor: pointer; transition: 0.2s; }
+        .upload-area:hover { border-color: #4caf50; background: #f0f8f0; }
+        .upload-area input { display: none; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>📅 Lash Studio - Админ панель</h1>
+</div>
+
+<div id="successMsg" class="success-msg">✅ Сохранено!</div>
+
+<div class="tabs">
+    <div class="tab active" onclick="showTab('calendar')">📅 Календарь</div>
+    <div class="tab" onclick="showTab('bookings')">📝 Записи</div>
+    <div class="tab" onclick="showTab('prices')">💰 Цены</div>
+    <div class="tab" onclick="showTab('content')">📝 Контент сайта</div>
+    <div class="tab" onclick="showTab('gallery')">🖼️ Галерея</div>
+</div>
+
+<div id="tab-calendar" class="tab-content active">
+    <div id="calendar-container">Загрузка...</div>
+</div>
+
+<div id="tab-bookings" class="tab-content">
+    <button class="btn btn-primary btn-sm" onclick="loadBookings()" style="margin-bottom:15px;">🔄 Обновить</button>
+    <div id="bookings-container">Загрузка...</div>
+</div>
+
+<div id="tab-prices" class="tab-content">
+    <h3>💰 Управление ценами</h3>
+    <div class="price-row"><span style="width:150px;">Наращивание ресниц:</span><input type="number" id="priceLashes"> ₽<button class="btn btn-primary btn-sm" onclick="savePrice('lashes')">Сохранить</button></div>
+    <div class="price-row"><span style="width:150px;">Ламинирование бровей:</span><input type="number" id="priceBrows"> ₽<button class="btn btn-primary btn-sm" onclick="savePrice('brows')">Сохранить</button></div>
+    <div class="price-row"><span style="width:150px;">Комплекс (ресницы+брови):</span><input type="number" id="priceComplex"> ₽<button class="btn btn-primary btn-sm" onclick="savePrice('complex')">Сохранить</button></div>
+    <div class="price-row"><span style="width:150px;">Предоплата (бронь):</span><input type="number" id="priceDeposit"> ₽<button class="btn btn-primary btn-sm" onclick="savePrice('deposit')">Сохранить</button></div>
+</div>
+
+<div id="tab-content" class="tab-content">
+    <h3>📝 Редактирование главной страницы</h3>
+    <div class="form-group"><label>Заголовок героя:</label><textarea id="hero_title" rows="2"></textarea></div>
+    <div class="form-group"><label>Текст героя:</label><textarea id="hero_text" rows="2"></textarea></div>
+    <div class="form-group"><label>О нас (текст):</label><textarea id="about" rows="4"></textarea></div>
+    <div class="form-group"><label>Адрес студии:</label><textarea id="address" rows="2"></textarea></div>
+    <div class="form-group"><label>Ссылка на Яндекс.Карты:</label><input type="text" id="map_link"></div>
+    <div class="form-group"><label>Ссылка на вызов такси:</label><input type="text" id="taxi_link"></div>
+    <button class="btn btn-primary" onclick="saveContent()">💾 Сохранить все</button>
+</div>
+
+<div id="tab-gallery" class="tab-content">
+    <h3>🖼️ Управление галереей</h3>
+    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+        <p>📸 Нажмите или перетащите фото для загрузки</p>
+        <p style="font-size:12px; color:#999;">Поддерживаются JPG, PNG, GIF</p>
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="uploadFiles(this.files)">
+    </div>
+    <div id="gallery-list" class="gallery-grid"></div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeModal()"></div>
+<div class="modal" id="modal">
+    <h3 id="modalTitle">Детали записи</h3>
+    <div id="modalContent"></div>
+    <div class="modal-buttons">
+        <button class="btn btn-primary" onclick="confirmBooking()">✅ Подтвердить</button>
+        <button class="btn btn-danger" onclick="cancelBooking()">❌ Отменить</button>
+        <button class="btn btn-warning" onclick="deleteBookingFromModal()">🗑️ Удалить</button>
+        <button onclick="closeModal()">Закрыть</button>
+    </div>
+</div>
+
+<div class="overlay" id="warningOverlay" onclick="closeWarningModal()"></div>
+<div class="modal" id="warningModal">
+    <h3>⚠️ Подтверждение</h3>
+    <div id="warningContent"></div>
+    <div class="modal-buttons">
+        <button class="btn btn-primary" id="confirmWarningBtn">✅ Да, удалить и сделать выходным</button>
+        <button onclick="closeWarningModal()">Отмена</button>
+    </div>
+</div>
+
+<script>
+    let currentBookingId = null;
+    let currentYear = new Date().getFullYear();
+    let currentMonth = new Date().getMonth() + 1;
+    let pendingDayOff = null;
+
+    function showTab(tabName) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+        if (tabName === 'calendar') loadCalendar();
+        if (tabName === 'bookings') loadBookings();
+        if (tabName === 'prices') loadPrices();
+        if (tabName === 'content') loadContent();
+        if (tabName === 'gallery') loadGallery();
+    }
+
+    async function loadCalendar() {
+        const res = await fetch(`/api/calendar-data?year=${currentYear}&month=${currentMonth}`);
+        const html = await res.text();
+        document.getElementById('calendar-container').innerHTML = html;
+    }
+
+    function changeMonth(delta) {
+        currentMonth += delta;
+        if (currentMonth < 1) { currentMonth = 12; currentYear--; }
+        if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+        loadCalendar();
+    }
+
+    window.editDayHours = function(date) {
+        window.location.href = `/admin/hours?date=${date}`;
+    };
+
+    window.toggleDayOff = async function(date) {
+        const res = await fetch(`/api/toggle-day-off/${date}`, { method: 'POST' });
+        const data = await res.json();
+        if (data.warning) {
+            pendingDayOff = date;
+            let msg = `<p>${data.message}</p><ul>`;
+            for (const b of data.bookings) {
+                msg += `<li><strong>${b.time}</strong> - ${b.client_name}</li>`;
+            }
+            msg += `</ul><p>Вы уверены, что хотите удалить эти записи и сделать день выходным?</p>`;
+            document.getElementById('warningContent').innerHTML = msg;
+            document.getElementById('warningModal').style.display = 'block';
+            document.getElementById('warningOverlay').style.display = 'block';
+        } else {
+            loadCalendar();
+            loadBookings();
+        }
+    };
+
+    document.getElementById('confirmWarningBtn').onclick = async function() {
+        await fetch(`/api/confirm-day-off/${pendingDayOff}`, { method: 'POST' });
+        closeWarningModal();
+        loadCalendar();
+        loadBookings();
+    };
+
+    function closeWarningModal() {
+        document.getElementById('warningModal').style.display = 'none';
+        document.getElementById('warningOverlay').style.display = 'none';
+        pendingDayOff = null;
+    }
+
+    async function loadBookings() {
+        const res = await fetch('/api/admin/bookings');
+        const bookings = await res.json();
+        let html = `<table class="bookings-table"><thead><tr><th>ID</th><th>Клиент</th><th>Телефон</th><th>Услуга</th><th>Дата</th><th>Статус</th><th></th></tr></thead><tbody>`;
+        for (const b of bookings) {
+            const service = b.service_type === 'lashes' ? 'Ресницы' : (b.service_type === 'brows' ? 'Брови' : 'Комплекс');
+            html += `<tr>
+                <td>${b.id}</td>
+                <td>${escapeHtml(b.client_name)}</td>
+                <td>${escapeHtml(b.client_phone)}</td>
+                <td>${service}</td>
+                <td>${new Date(b.booking_date).toLocaleString()}</td>
+                <td class="status-${b.status}">${b.status}</td>
+                <td><button class="btn-sm" onclick="showDetail(${b.id})">📋</button><button class="btn-sm btn-danger" onclick="deleteBooking(${b.id})">🗑️</button></td>
+            </tr>`;
+        }
+        html += '</tbody></table>';
+        document.getElementById('bookings-container').innerHTML = html || '<p>Нет записей</p>';
+    }
+
+    window.showDetail = async function(id) {
+        currentBookingId = id;
+        const res = await fetch(`/api/admin/booking/${id}`);
+        const b = await res.json();
+        const service = b.service_type === 'lashes' ? 'Наращивание ресниц' : (b.service_type === 'brows' ? 'Ламинирование бровей' : 'Комплекс');
+        document.getElementById('modalContent').innerHTML = `
+            <p><strong>Клиент:</strong> ${escapeHtml(b.client_name)}</p>
+            <p><strong>Телефон:</strong> ${escapeHtml(b.client_phone)}</p>
+            <p><strong>Услуга:</strong> ${service}</p>
+            <p><strong>Дата:</strong> ${new Date(b.booking_date).toLocaleString()}</p>
+            <p><strong>Статус:</strong> <span class="status-${b.status}">${b.status}</span></p>
+        `;
+        document.getElementById('modal').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+    };
+
+    async function confirmBooking() {
+        await fetch(`/api/admin/confirm/${currentBookingId}`, { method: 'POST' });
+        showSuccess('✅ Запись подтверждена');
+        closeModal();
+        loadBookings();
+        loadCalendar();
+    }
+
+    async function cancelBooking() {
+        if (!confirm('Отменить запись?')) return;
+        await fetch(`/api/admin/cancel/${currentBookingId}`, { method: 'POST' });
+        showSuccess('Запись отменена');
+        closeModal();
+        loadBookings();
+        loadCalendar();
+    }
+
+    async function deleteBooking(id) {
+        if (!confirm('Удалить запись навсегда?')) return;
+        await fetch(`/api/booking/${id}`, { method: 'DELETE' });
+        showSuccess('Запись удалена');
+        loadBookings();
+        loadCalendar();
+    }
+
+    async function deleteBookingFromModal() {
+        if (!currentBookingId) return;
+        if (!confirm('Удалить запись навсегда?')) return;
+        await fetch(`/api/booking/${currentBookingId}`, { method: 'DELETE' });
+        showSuccess('Запись удалена');
+        closeModal();
+        loadBookings();
+        loadCalendar();
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        currentBookingId = null;
+    }
+
+    async function loadPrices() {
+        const res = await fetch('/api/prices');
+        const p = await res.json();
+        document.getElementById('priceLashes').value = p.lashes;
+        document.getElementById('priceBrows').value = p.brows;
+        document.getElementById('priceComplex').value = p.complex;
+        document.getElementById('priceDeposit').value = p.deposit;
+    }
+
+    async function savePrice(service) {
+        let price = document.getElementById(`price${service.charAt(0).toUpperCase() + service.slice(1)}`).value;
+        await fetch('/api/prices', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ service, price: parseInt(price) }) });
+        showSuccess('💰 Цена сохранена');
+    }
+
+    async function loadContent() {
+        const res = await fetch('/api/site-content');
+        const c = await res.json();
+        document.getElementById('hero_title').value = c.hero_title || '';
+        document.getElementById('hero_text').value = c.hero_text || '';
+        document.getElementById('about').value = c.about || '';
+        document.getElementById('address').value = c.address || '';
+        document.getElementById('map_link').value = c.map_link || '';
+        document.getElementById('taxi_link').value = c.taxi_link || '';
+    }
+
+    async function saveContent() {
+        await fetch('/api/site-content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'hero_title', content: document.getElementById('hero_title').value }) });
+        await fetch('/api/site-content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'hero_text', content: document.getElementById('hero_text').value }) });
+        await fetch('/api/site-content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'about', content: document.getElementById('about').value }) });
+        await fetch('/api/site-content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'address', content: document.getElementById('address').value }) });
+        await fetch('/api/site-content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'map_link', content: document.getElementById('map_link').value }) });
+        await fetch('/api/site-content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'taxi_link', content: document.getElementById('taxi_link').value }) });
+        showSuccess('📝 Контент сохранён');
+    }
+
+    async function loadGallery() {
+        const res = await fetch('/api/gallery');
+        const images = await res.json();
+        let html = '';
+        for (const img of images) {
+            html += `<div class="gallery-item"><img src="${img.url}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'"><p>${escapeHtml(img.title || '')}</p><button class="delete-img" onclick="deleteImage(${img.id})">✖</button></div>`;
+        }
+        document.getElementById('gallery-list').innerHTML = html || '<p>Нет фото. Загрузите первое!</p>';
+    }
+
+    async function uploadFiles(files) {
+        for (const file of files) {
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch('/api/upload-image', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.ok) showSuccess(`✅ ${file.name} загружено`);
+            else showSuccess(`❌ Ошибка загрузки ${file.name}`, 'error');
+        }
+        loadGallery();
+    }
+
+    async function deleteImage(id) {
+        if (!confirm('Удалить фото?')) return;
+        await fetch(`/api/gallery/${id}`, { method: 'DELETE' });
+        loadGallery();
+        showSuccess('Фото удалено');
+    }
+
+    function showSuccess(msg, type = 'success') {
+        const el = document.getElementById('successMsg');
+        el.innerText = msg;
+        el.style.display = 'block';
+        setTimeout(() => { el.style.display = 'none'; }, 3000);
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    loadCalendar();
+    loadPrices();
+    loadContent();
+    loadGallery();
+</script>
+</body>
+</html>

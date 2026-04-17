@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление часами - Lash Studio</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f7fb;padding:30px 20px}
+        .container{max-width:900px;margin:0 auto;background:white;border-radius:20px;padding:30px;box-shadow:0 5px 20px rgba(0,0,0,0.1)}
+        h1{margin-bottom:10px;color:#1a1a2e}
+        .date-info{color:#666;margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid #e9ecef}
+        .hours-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:12px;margin:25px 0}
+        .hour-slot{background:#f8f9fa;border:2px solid #e9ecef;border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s}
+        .hour-slot:hover{transform:scale(1.02)}
+        .hour-slot.closed{background:#ffcdd2;border-color:#f44336;text-decoration:line-through}
+        .hour-slot.break{background:#fff3e0;border-color:#ff9800}
+        .hour-slot.booked{background:#e0e0e0;border-color:#999;text-decoration:line-through;cursor:not-allowed}
+        .hour-time{font-size:18px;font-weight:bold}
+        .hour-status{font-size:11px;margin-top:5px}
+        .btn{padding:10px 20px;border:none;border-radius:10px;cursor:pointer;font-weight:600}
+        .btn-primary{background:#4caf50;color:white}
+        .btn-warning{background:#ff9800;color:white}
+        .btn-danger{background:#f44336;color:white}
+        .btn-secondary{background:#6c757d;color:white}
+        .btn-add{background:#2196f3;color:white}
+        .back-link{display:inline-block;margin-bottom:20px;color:#2196f3;text-decoration:none}
+        .button-group{display:flex;gap:12px;margin-top:25px;flex-wrap:wrap}
+        .modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:30px;border-radius:20px;z-index:1000;width:450px;box-shadow:0 10px 40px rgba(0,0,0,0.2)}
+        .overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999}
+        .form-group{margin-bottom:15px}
+        .form-group label{display:block;margin-bottom:5px;font-weight:600}
+        .form-group input,.form-group select{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px}
+        .service-duration{font-size:12px;color:#666;margin-top:5px}
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/admin" class="back-link">← Назад в админ-панель</a>
+    <h1>⏰ Управление часами работы</h1>
+    <div class="date-info" id="dateDisplay"></div>
+    
+    <div class="button-group" style="margin-bottom:15px">
+        <button class="btn btn-add" onclick="openAddBookingModal()">➕ Записать клиента</button>
+    </div>
+    
+    <div class="hours-grid" id="hoursGrid"></div>
+    
+    <div class="button-group">
+        <button class="btn btn-warning" onclick="setBreak()">☕ Установить перерыв (14:00-15:00)</button>
+        <button class="btn btn-danger" onclick="closeAll()">🔒 Закрыть все часы</button>
+        <button class="btn btn-primary" onclick="saveHours()">💾 Сохранить настройки</button>
+        <button class="btn btn-secondary" onclick="copyToWeek()">📋 Скопировать на неделю</button>
+    </div>
+</div>
+
+<!-- Модальное окно для добавления записи -->
+<div class="overlay" id="modalOverlay" onclick="closeModal()"></div>
+<div class="modal" id="addBookingModal">
+    <h3>📝 Добавить запись клиента</h3>
+    <form id="addBookingForm">
+        <div class="form-group">
+            <label>👤 Имя клиента</label>
+            <input type="text" id="clientName" required>
+        </div>
+        <div class="form-group">
+            <label>📞 Телефон</label>
+            <input type="tel" id="clientPhone" placeholder="+7XXXXXXXXXX" required>
+        </div>
+        <div class="form-group">
+            <label>💇 Услуга</label>
+            <select id="serviceType" onchange="updateServiceInfo()">
+                <option value="lashes">Наращивание ресниц (2.5 часа)</option>
+                <option value="brows">Ламинирование бровей (1 час)</option>
+                <option value="complex">Комплекс (ресницы+брови) (3 часа)</option>
+            </select>
+            <div class="service-duration" id="durationInfo">⏱️ Время бронирования: 2.5 часа</div>
+        </div>
+        <div class="form-group">
+            <label>⏰ Время начала</label>
+            <select id="bookingTime" required></select>
+        </div>
+        <div class="form-group">
+            <label>💬 Комментарий</label>
+            <textarea id="comment" rows="2" placeholder="Пожелания, аллергия..."></textarea>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:20px">
+            <button type="submit" class="btn btn-primary">✅ Сохранить запись</button>
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+        </div>
+    </form>
+</div>
+
+<script>
+const urlParams=new URLSearchParams(window.location.search);
+const date=urlParams.get('date');
+document.getElementById('dateDisplay').innerHTML=`📅 <strong>${date}</strong> — настройте рабочие часы`;
+
+const allHours=['10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
+let closedHours=[],breakStart=null,breakEnd=null,bookedSlots=[];
+
+// Длительность услуг в часах
+const SERVICE_DURATION = {
+    "lashes": 2.5,
+    "brows": 1.0,
+    "complex": 3.0
+};
+
+async function loadHours(){
+    try{
+        const res=await fetch(`/api/hours/get/${date}`);
+        const data=await res.json();
+        closedHours=data.closed_hours||[];
+        breakStart=data.break_start;
+        breakEnd=data.break_end;
+        
+        const bookingsRes=await fetch(`/api/hours/booked-slots/${date}`);
+        const bookingsData=await bookingsRes.json();
+        bookedSlots=bookingsData.slots||[];
+        
+        renderGrid();
+        updateAvailableTimes();
+    }catch(e){console.error('Ошибка загрузки:',e);}
+}
+
+function renderGrid(){
+    let html='';
+    for(const hour of allHours){
+        let isClosed=closedHours.includes(hour);
+        let isBooked=bookedSlots.includes(hour);
+        let isBreak=breakStart&&breakEnd&&hour>=breakStart&&hour<breakEnd;
+        let statusClass='';
+        let statusText='';
+        
+        if(isClosed){statusClass='closed';statusText='🔒 Закрыт админом';}
+        else if(isBooked){statusClass='booked';statusText='📅 Занят (есть запись)';}
+        else if(isBreak){statusClass='break';statusText='☕ Перерыв';}
+        else{statusText='✅ Открыт';}
+        
+        html+=`<div class="hour-slot ${statusClass}" onclick="${isBooked?'':'toggleHour(\''+hour+'\')'}"><div class="hour-time">${hour}</div><div class="hour-status">${statusText}</div></div>`;
+    }
+    document.getElementById('hoursGrid').innerHTML=html;
+}
+
+function toggleHour(hour){
+    if(closedHours.includes(hour)){closedHours=closedHours.filter(h=>h!==hour);}
+    else{closedHours.push(hour);}
+    renderGrid();
+    updateAvailableTimes();
+}
+
+function setBreak(){
+    closedHours=closedHours.filter(h=>h!=='14:00'&&h!=='15:00');
+    breakStart='14:00';
+    breakEnd='15:00';
+    renderGrid();
+    updateAvailableTimes();
+}
+
+function closeAll(){
+    closedHours=[...allHours];
+    breakStart=null;
+    breakEnd=null;
+    renderGrid();
+    updateAvailableTimes();
+}
+
+async function saveHours(){
+    await fetch('/api/hours/save',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({date,closed_hours:closedHours,break_start:breakStart,break_end:breakEnd})
+    });
+    alert('✅ Настройки сохранены!');
+    window.location.href='/admin';
+}
+
+async function copyToWeek(){
+    if(!confirm('Скопировать это расписание на всю следующую неделю?'))return;
+    await fetch('/api/hours/copy-to-week',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({source_date:date,hours_data:{closed_hours:closedHours,break_start:breakStart,break_end:breakEnd}})
+    });
+    alert('✅ Расписание скопировано на неделю!');
+}
+
+// Функции для добавления записи
+function updateServiceInfo(){
+    const service = document.getElementById('serviceType').value;
+    const duration = SERVICE_DURATION[service];
+    document.getElementById('durationInfo').innerHTML = `⏱️ Время бронирования: ${duration} часа(ов)`;
+    updateAvailableTimes();
+}
+
+function updateAvailableTimes(){
+    const service = document.getElementById('serviceType').value;
+    const duration = SERVICE_DURATION[service];
+    const timeSelect = document.getElementById('bookingTime');
+    timeSelect.innerHTML = '';
+    
+    for(const hour of allHours){
+        let isClosed = closedHours.includes(hour);
+        let isBreak = breakStart && breakEnd && hour >= breakStart && hour < breakEnd;
+        let isBooked = false;
+        
+        // Проверяем, занят ли слот с учётом длительности
+        const hourNum = parseInt(hour.split(':')[0]);
+        for(let i = 0; i < duration; i++){
+            const checkHour = `${hourNum + i}:00`;
+            if(hourNum + i > 19) break;
+            if(bookedSlots.includes(checkHour)){
+                isBooked = true;
+                break;
+            }
+        }
+        
+        if(!isClosed && !isBreak && !isBooked && hourNum + duration <= 20){
+            const option = document.createElement('option');
+            option.value = hour;
+            option.textContent = `${hour} (до ${hourNum + duration}:00)`;
+            timeSelect.appendChild(option);
+        }
+    }
+}
+
+async function openAddBookingModal(){
+    await loadHours();
+    document.getElementById('addBookingModal').style.display = 'block';
+    document.getElementById('modalOverlay').style.display = 'block';
+    updateAvailableTimes();
+}
+
+function closeModal(){
+    document.getElementById('addBookingModal').style.display = 'none';
+    document.getElementById('modalOverlay').style.display = 'none';
+}
+
+document.getElementById('addBookingForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('clientName').value.trim();
+    const phone = document.getElementById('clientPhone').value.trim();
+    const service = document.getElementById('serviceType').value;
+    const time = document.getElementById('bookingTime').value;
+    const comment = document.getElementById('comment').value;
+    
+    if(!name || !phone || !time){
+        alert('Заполните все обязательные поля');
+        return;
+    }
+    
+    const bookingDateTime = `${date}T${time}:00`;
+    
+    const response = await fetch('/api/admin/manual-booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            client_name: name,
+            client_phone: phone,
+            service_type: service,
+            booking_date: bookingDateTime,
+            comment: comment
+        })
+    });
+    
+    if(response.ok){
+        alert('✅ Запись добавлена!');
+        closeModal();
+        loadHours();
+        document.getElementById('addBookingForm').reset();
+    } else {
+        const error = await response.json();
+        alert('❌ Ошибка: ' + (error.detail || 'Не удалось добавить запись'));
+    }
+});
+
+document.getElementById('serviceType').addEventListener('change', updateAvailableTimes);
+
+loadHours();
+</script>
+</body>
+</html>

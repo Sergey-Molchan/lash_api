@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lash Studio - Наращивание ресниц и ламинирование бровей в Адлере</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #fff;
+            color: #2d2f48;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 18px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .logo span { color: #e94560; }
+        .nav {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .nav a:hover { color: #e94560; }
+        .btn-book {
+            background: #e94560;
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+        }
+        .btn-book:hover { background: #c73e54; color: white !important; }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 160px 0 100px;
+            text-align: center;
+        }
+        .hero h1 { font-size: 52px; margin-bottom: 20px; font-weight: 700; }
+        .hero p { font-size: 20px; margin-bottom: 35px; }
+        .hero-btn {
+            display: inline-block;
+            background: white;
+            color: #764ba2;
+            padding: 14px 42px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+        .hero-btn:hover { transform: scale(1.03); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+
+        .services {
+            padding: 80px 0;
+            background: #f8f9ff;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 38px;
+            margin-bottom: 55px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 35px;
+        }
+        .service-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: 0.3s;
+        }
+        .service-card:hover { transform: translateY(-8px); }
+        .service-img {
+            height: 260px;
+            background-size: cover;
+            background-position: center;
+        }
+        .service-content { padding: 24px; }
+        .service-content h3 { font-size: 22px; margin-bottom: 12px; }
+        .price { color: #e94560; font-size: 28px; font-weight: 700; margin: 15px 0; }
+
+        .contact {
+            padding: 80px 0;
+            background: white;
+        }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+        }
+        .contact-info h3 { font-size: 28px; margin-bottom: 25px; color: #1a1a2e; }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            font-size: 18px;
+        }
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            background: #f0f2ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .map-container {
+            height: 350px;
+            background: #e9ecef;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .taxi-btn {
+            display: inline-block;
+            background: #ff9800;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+        .taxi-btn:hover { background: #fb8c00; transform: scale(1.02); }
+        .call-btn {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 12px;
+            transition: 0.3s;
+        }
+        .call-btn:hover { background: #45a049; transform: scale(1.02); }
+
+        .footer {
+            background: #1a1a2e;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 900px) {
+            .hero h1 { font-size: 36px; }
+            .contact-grid { grid-template-columns: 1fr; }
+            .header-inner { flex-direction: column; }
+            .hero { padding: 200px 0 80px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo">Lash <span>Studio</span></div>
+            <div class="nav">
+                <a href="#services">Услуги</a>
+                <a href="/portfolio">Портфолио</a>
+                <a href="#contact">Контакты</a>
+                <a href="/booking" class="btn-book">Записаться</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1 id="heroTitle">✨ Идеальный взгляд начинается здесь</h1>
+            <p id="heroText">Наращивание ресниц и ламинирование бровей в Адлере</p>
+            <a href="/booking" class="hero-btn">Записаться сейчас</a>
+        </div>
+    </section>
+
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title">Наши услуги</h2>
+            <div class="services-grid" id="servicesGrid"></div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Контакты</h2>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Как нас найти</h3>
+                    <div class="info-item"><div class="info-icon">📍</div><div id="address"></div></div>
+                    <div class="info-item"><div class="info-icon">📞</div><div id="phone"></div></div>
+                    <div>
+                        <a href="#" id="mapLink" class="taxi-btn" target="_blank" style="background:#2196f3;">🗺️ Открыть карту</a>
+                        <a href="#" id="taxiLink" class="taxi-btn" target="_blank">🚕 Вызвать такси</a>
+                        <a href="#" id="callLink" class="call-btn" target="_blank">📞 Позвонить</a>
+                    </div>
+                </div>
+                <div class="map-container">
+                    <iframe
+                        src="https://yandex.ru/map-widget/v1/?pt=39.911025,43.452585&z=17&l=map"
+                        width="100%"
+                        height="100%"
+                        frameborder="0"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 Lash Studio. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        async function loadContent() {
+            const res = await fetch('/api/site-content');
+            const c = await res.json();
+            document.getElementById('heroTitle').innerText = c.hero_title || '✨ Идеальный взгляд начинается здесь';
+            document.getElementById('heroText').innerText = c.hero_text || 'Наращивание ресниц и ламинирование бровей в Адлере';
+            document.getElementById('address').innerHTML = c.address || '📍 улица Голубые Дали, 78, Адлер';
+            document.getElementById('phone').innerHTML = c.phone || '+7 (928) 458-55-80';
+
+            const mapLink = document.getElementById('mapLink');
+            const taxiLink = document.getElementById('taxiLink');
+            const callLink = document.getElementById('callLink');
+
+            if (c.map_link) mapLink.href = c.map_link;
+            if (c.taxi_link) taxiLink.href = c.taxi_link;
+            if (c.phone) callLink.href = `tel:${c.phone.replace(/[^0-9+]/g, '')}`;
+        }
+
+        async function loadPrices() {
+            const res = await fetch('/api/prices');
+            const p = await res.json();
+            document.getElementById('servicesGrid').innerHTML = `
+                <div class="service-card"><div class="service-img" style="background-image: url('https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=400');"></div><div class="service-content"><h3>Наращивание ресниц</h3><p>Классическое, 2D, 3D объем. Натуральный и эффектный результат.</p><div class="price">от ${p.lashes} ₽</div><a href="/booking" style="color:#e94560; text-decoration:none;">Записаться →</a></div></div>
+                <div class="service-card"><div class="service-img" style="background-image: url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400');"></div><div class="service-content"><h3>Ламинирование бровей</h3><p>Укладка, окрашивание, уход. Идеальная форма надолго.</p><div class="price">от ${p.brows} ₽</div><a href="/booking" style="color:#e94560; text-decoration:none;">Записаться →</a></div></div>
+                <div class="service-card"><div class="service-img" style="background-image: url('https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400');"></div><div class="service-content"><h3>Комплекс: Ресницы + Брови</h3><p>Комплексный уход за глазами со скидкой</p><div class="price">${p.complex} ₽</div><a href="/booking" style="color:#e94560; text-decoration:none;">Записаться →</a></div></div>
+            `;
+        }
+
+        loadContent();
+        loadPrices();
+    </script>
+</body>
+</html>
