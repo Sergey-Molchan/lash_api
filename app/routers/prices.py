@@ -15,7 +15,12 @@ class PriceUpdate(BaseModel):
 async def get_prices(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Price))
     prices = {p.service: p.price for p in result.scalars().all()}
-    return {"lashes": prices.get("lashes", 2500), "brows": prices.get("brows", 2000), "complex": prices.get("complex", 3800), "deposit": prices.get("deposit", 300)}
+    return {
+        "lashes": prices.get("lashes", 2500),
+        "brows": prices.get("brows", 2000),
+        "complex": prices.get("complex", 3800),
+        "deposit": prices.get("deposit", 300)
+    }
 
 @router.post("/")
 async def update_price(update: PriceUpdate, db: AsyncSession = Depends(get_db)):
