@@ -13,7 +13,7 @@ class Booking(Base):
     status = Column(String(20), default="pending")
     amount = Column(Float, default=300.0)
     paid = Column(Boolean, default=False)
-    notes = Column(Text, nullable=True)  # комментарий к записи
+    notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
 
 class WorkingHours(Base):
@@ -59,27 +59,3 @@ class Comment(Base):
     emoji = Column(String(10), default="😊")
     is_approved = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.now)
-class Payment(Base):
-    __tablename__ = "payments"
-    id = Column(Integer, primary_key=True, index=True)
-    booking_id = Column(Integer, nullable=False, index=True)  # связь с бронированием
-    payment_id = Column(String(100), unique=True, index=True)  # ID в платёжной системе
-    amount = Column(Float, default=300.0)
-    status = Column(String(20), default="pending")  # pending, paid, refunded, failed
-    payment_method = Column(String(50), default="sbp")  # sbp, card
-    payment_data = Column(Text, nullable=True)  # JSON с данными платежа
-    paid_at = Column(DateTime, nullable=True)
-    refunded_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.now)
-
-class Refund(Base):
-    __tablename__ = "refunds"
-    id = Column(Integer, primary_key=True, index=True)
-    payment_id = Column(Integer, nullable=False, index=True)  # связь с платежом
-    booking_id = Column(Integer, nullable=False, index=True)  # связь с бронированием
-    amount = Column(Float, nullable=False)
-    reason = Column(Text, nullable=True)
-    status = Column(String(20), default="pending")  # pending, completed, failed
-    refund_id = Column(String(100), nullable=True)  # ID возврата в платёжной системе
-    created_at = Column(DateTime, default=datetime.now)
-    completed_at = Column(DateTime, nullable=True)

@@ -20,12 +20,10 @@ if USE_REAL_PAYMENT:
 
 @router.get("/sbp/{booking_id}")
 async def get_sbp_payment(booking_id: int, db: AsyncSession = Depends(get_db)):
-    """Генерация оплаты через СБП"""
     booking = await db.get(Booking, booking_id)
     if not booking:
         raise HTTPException(404, "Запись не найдена")
     
-    # Проверяем, нет ли уже оплаты для этой записи
     existing_payment = await db.execute(
         select(Payment).where(Payment.booking_id == booking_id, Payment.status.in_(['paid', 'pending']))
     )
@@ -34,7 +32,6 @@ async def get_sbp_payment(booking_id: int, db: AsyncSession = Depends(get_db)):
         return {"error": "Это бронирование уже оплачено", "payment_status": "paid"}
     
     if USE_REAL_PAYMENT:
-        # РЕАЛЬНАЯ ИНТЕГРАЦИЯ С ЮKassa
         try:
             idempotence_key = str(uuid.uuid4())
             payment_data = {
@@ -46,7 +43,6 @@ async def get_sbp_payment(booking_id: int, db: AsyncSession = Depends(get_db)):
             }
             yk_payment = YKPayment.create(payment_data, idempotence_key)
             
-            # Сохраняем информацию о платеже в БД
             db_payment = Payment(
                 booking_id=booking_id,
                 payment_id=yk_payment.id,
@@ -69,8 +65,6 @@ async def get_sbp_payment(booking_id: int, db: AsyncSession = Depends(get_db)):
         except Exception as e:
             raise HTTPException(400, f"Ошибка создания платежа: {str(e)}")
     else:
-        # ЗАГЛУШКА (для тестирования)
-        # Сохраняем тестовый платеж в БД
         db_payment = Payment(
             booking_id=booking_id,
             payment_id=f"test_{uuid.uuid4().hex[:8]}",
@@ -94,14 +88,11 @@ async def get_sbp_payment(booking_id: int, db: AsyncSession = Depends(get_db)):
 
 @router.post("/webhook/sbp")
 async def sbp_webhook(request: Request, db: AsyncSession = Depends(get_db)):
-    """Webhook для получения статуса оплаты"""
     data = await request.json()
-    
     booking_id = data.get("booking_id")
     status = data.get("status")
     payment_id = data.get("payment_id")
     
-    # Находим платеж в БД
     if payment_id:
         result = await db.execute(select(Payment).where(Payment.payment_id == payment_id))
     else:
@@ -113,34 +104,24 @@ async def sbp_webhook(request: Request, db: AsyncSession = Depends(get_db)):
         if payment:
             payment.status = "paid"
             payment.paid_at = datetime.now()
-            
-            # Обновляем статус бронирования
             booking = await db.get(Booking, booking_id)
             if booking:
                 booking.status = "confirmed"
                 booking.paid = True
-            
             await db.commit()
-            print(f"✅ Платеж {payment_id} для бронирования {booking_id} успешно завершен!")
-            
     elif status == "success" and payment:
-        # Тестовый платеж
         payment.status = "paid"
         payment.paid_at = datetime.now()
-        
         booking = await db.get(Booking, booking_id)
         if booking:
             booking.status = "confirmed"
             booking.paid = True
-        
         await db.commit()
-        print(f"✅ Тестовый платеж для бронирования {booking_id} успешно завершен!")
     
     return {"ok": True}
 
 @router.post("/refund/{booking_id}")
 async def refund_payment(booking_id: int, reason: str = None, db: AsyncSession = Depends(get_db)):
-    """Возврат средств за оплаченное бронирование"""
     booking = await db.get(Booking, booking_id)
     if not booking:
         raise HTTPException(404, "Бронирование не найдено")
@@ -148,14 +129,12 @@ async def refund_payment(booking_id: int, reason: str = None, db: AsyncSession =
     if not booking.paid:
         raise HTTPException(400, "Бронирование не оплачено, возврат невозможен")
     
-    # Находим платеж
     result = await db.execute(select(Payment).where(Payment.booking_id == booking_id, Payment.status == "paid"))
     payment = result.scalar_one_or_none()
     if not payment:
         raise HTTPException(404, "Платёж не найден")
     
     if USE_REAL_PAYMENT and payment.payment_id and not payment.payment_id.startswith("test_"):
-        # Реальный возврат через ЮKassa
         try:
             from yookassa import Refund as YKRefund
             refund = YKRefund.create({
@@ -167,11 +146,9 @@ async def refund_payment(booking_id: int, reason: str = None, db: AsyncSession =
         except Exception as e:
             raise HTTPException(400, f"Ошибка возврата средств: {str(e)}")
     else:
-        # Тестовый возврат
         refund_id = f"refund_test_{uuid.uuid4().hex[:8]}"
         refund_status = "succeeded"
     
-    # Сохраняем информацию о возврате
     db_refund = Refund(
         payment_id=payment.id,
         booking_id=booking_id,
@@ -183,7 +160,6 @@ async def refund_payment(booking_id: int, reason: str = None, db: AsyncSession =
     )
     db.add(db_refund)
     
-    # Обновляем статус платежа и бронирования
     payment.status = "refunded"
     payment.refunded_at = datetime.now()
     booking.status = "cancelled"
@@ -201,7 +177,6 @@ async def refund_payment(booking_id: int, reason: str = None, db: AsyncSession =
 
 @router.get("/status/{booking_id}")
 async def get_payment_status(booking_id: int, db: AsyncSession = Depends(get_db)):
-    """Получить статус оплаты по бронированию"""
     booking = await db.get(Booking, booking_id)
     if not booking:
         raise HTTPException(404, "Бронирование не найдено")
@@ -223,10 +198,7 @@ async def get_payment_status(booking_id: int, db: AsyncSession = Depends(get_db)
 
 @router.get("/history")
 async def get_payment_history(db: AsyncSession = Depends(get_db)):
-    """Получить историю всех платежей (для админки)"""
-    result = await db.execute(
-        select(Payment).order_by(Payment.created_at.desc())
-    )
+    result = await db.execute(select(Payment).order_by(Payment.created_at.desc()))
     payments = result.scalars().all()
     
     history = []
@@ -239,9 +211,7 @@ async def get_payment_history(db: AsyncSession = Depends(get_db)):
             "client_phone": booking.client_phone if booking else "Unknown",
             "amount": p.amount,
             "status": p.status,
-            "created_at": p.created_at,
             "paid_at": p.paid_at,
-            "refunded_at": p.refunded_at
+            "created_at": p.created_at
         })
-    
     return history

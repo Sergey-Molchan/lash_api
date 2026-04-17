@@ -172,24 +172,24 @@
         window.location.href = `/admin/hours?date=${date}`;
     };
 
-    window.toggleDayOff = async function(date) {
-        const res = await fetch(`/api/toggle-day-off/${date}`, { method: 'POST' });
-        const data = await res.json();
-        if (data.warning) {
-            pendingDayOff = date;
-            let msg = `<p>${data.message}</p><ul>`;
-            for (const b of data.bookings) {
-                msg += `<li><strong>${b.time}</strong> - ${b.client_name}</li>`;
-            }
-            msg += `</ul><p>Вы уверены, что хотите удалить эти записи и сделать день выходным?</p>`;
-            document.getElementById('warningContent').innerHTML = msg;
-            document.getElementById('warningModal').style.display = 'block';
-            document.getElementById('warningOverlay').style.display = 'block';
-        } else {
-            loadCalendar();
-            loadBookings();
+   window.toggleDayOff = async function(date) {
+    const res = await fetch(`/api/toggle-day-off/${date}`, { method: 'POST' });
+    const data = await res.json();
+    if (data.warning) {
+        pendingDayOff = date;
+        let msg = `<p>${data.message}</p><ul>`;
+        for (const b of data.bookings) {
+            msg += `<li><strong>${b.time}</strong> - ${b.client_name}</li>`;
         }
-    };
+        msg += `</ul><p>Вы уверены, что хотите удалить эти записи и сделать день выходным?</p>`;
+        document.getElementById('warningContent').innerHTML = msg;
+        document.getElementById('warningModal').style.display = 'block';
+        document.getElementById('warningOverlay').style.display = 'block';
+    } else {
+        await loadCalendar();
+        await loadBookings();
+    }
+};
 
     document.getElementById('confirmWarningBtn').onclick = async function() {
         await fetch(`/api/confirm-day-off/${pendingDayOff}`, { method: 'POST' });
@@ -364,6 +364,16 @@
     loadPrices();
     loadContent();
     loadGallery();
+    window.showBookingDetail = function(id) {
+    fetch(`/api/admin/booking/${id}`).then(r=>r.json()).then(b => {
+        alert(`Клиент: ${b.client_name}\nТелефон: ${b.client_phone}\nУслуга: ${b.service_type}\nСтатус: ${b.status}\nКомментарий: ${b.notes || 'Нет'}`);
+    });
+};
+
+window.editDayHours = function(date) {
+    window.location.href = `/admin/hours?date=${date}`;
+};
 </script>
 </body>
+</html>
 </html>
