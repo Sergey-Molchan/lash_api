@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Портфолио - Lash Studio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f5f7fb;
+            color: #2d2f48;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 18px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .logo span { color: #e94560; }
+        .nav {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .nav a:hover { color: #e94560; }
+        .btn-book {
+            background: #e94560;
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+        }
+
+        .portfolio-section {
+            padding: 140px 0 80px;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 50px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .gallery-item {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+        }
+        .gallery-item p {
+            padding: 12px;
+            text-align: center;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .modal img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+        }
+
+        .footer {
+            background: #1a1a2e;
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+            .section-title { font-size: 32px; }
+            .nav { gap: 16px; }
+            .header-inner { flex-direction: column; }
+            .portfolio-section { padding: 180px 0 60px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo">Lash <span>Studio</span></div>
+            <div class="nav">
+                <a href="/">Главная</a>
+                <a href="/portfolio" style="color:#e94560;">Портфолио</a>
+                <a href="/booking" class="btn-book">Записаться</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="portfolio-section">
+        <div class="container">
+            <h2 class="section-title">Наши работы</h2>
+            <div class="gallery-grid" id="galleryGrid"></div>
+        </div>
+    </section>
+
+    <div class="modal" id="imageModal" onclick="closeModal()">
+        <span class="close-modal">&times;</span>
+        <img id="modalImage" src="">
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 Lash Studio. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        async function loadGallery() {
+            const res = await fetch('/api/gallery');
+            const images = await res.json();
+            let html = '';
+            for (const img of images) {
+                html += `<div class="gallery-item" onclick="openModal('${img.url}')">
+                    <img src="${img.url}" onerror="this.src='https://via.placeholder.com/300?text=No+Image'">
+                    <p>${escapeHtml(img.title || 'Наши работы')}</p>
+                </div>`;
+            }
+            document.getElementById('galleryGrid').innerHTML = html || '<p style="text-align:center; grid-column:1/-1;">Фотографии скоро появятся</p>';
+        }
+
+        function openModal(url) {
+            document.getElementById('modalImage').src = url;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        loadGallery();
+    </script>
+</body>
+</html>

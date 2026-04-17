@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление часами - Lash Studio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f5f7fb;
+            padding: 30px 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        h1 { margin-bottom: 10px; color: #1a1a2e; }
+        .date-info { color: #666; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #e9ecef; }
+        .hours-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; margin: 25px 0; }
+        .hour-slot { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .hour-slot:hover { transform: scale(1.02); }
+        .hour-slot.closed { background: #ffcdd2; border-color: #f44336; text-decoration: line-through; }
+        .hour-slot.break { background: #fff3e0; border-color: #ff9800; }
+        .hour-time { font-size: 18px; font-weight: bold; }
+        .hour-status { font-size: 11px; margin-top: 5px; color: #666; }
+        .button-group { display: flex; gap: 12px; margin-top: 25px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .btn-primary { background: #4caf50; color: white; }
+        .btn-primary:hover { background: #45a049; }
+        .btn-warning { background: #ff9800; color: white; }
+        .btn-warning:hover { background: #fb8c00; }
+        .btn-danger { background: #f44336; color: white; }
+        .btn-danger:hover { background: #d32f2f; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #2196f3; text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/admin" class="back-link">← Назад в админ-панель</a>
+        <h1>⏰ Управление часами работы</h1>
+        <div class="date-info" id="dateDisplay"></div>
+        <div class="hours-grid" id="hoursGrid"></div>
+        <div class="button-group">
+            <button class="btn btn-warning" onclick="setBreak()">☕ Установить перерыв (14:00-15:00)</button>
+            <button class="btn btn-danger" onclick="closeAll()">🔒 Закрыть все часы</button>
+            <button class="btn btn-primary" onclick="saveHours()">💾 Сохранить настройки</button>
+            <button class="btn btn-secondary" onclick="copyToWeek()">📋 Скопировать на неделю</button>
+        </div>
+    </div>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const date = urlParams.get('date');
+        document.getElementById('dateDisplay').innerHTML = `📅 <strong>${date}</strong> — настройте рабочие часы`;
+
+        const allHours = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+        let closedHours = [];
+        let breakStart = null;
+        let breakEnd = null;
+        let bookedSlots = [];
+
+        async function loadHours() {
+            const res = await fetch(`/api/get-day-hours?date=${date}`);
+            const data = await res.json();
+            closedHours = data.closed_hours || [];
+            breakStart = data.break_start;
+            breakEnd = data.break_end;
+
+            const bookingsRes = await fetch(`/api/booked-slots?date=${date}`);
+            const bookingsData = await bookingsRes.json();
+            bookedSlots = bookingsData.slots || [];
+
+            renderGrid();
+        }
+
+        function renderGrid() {
+            let html = '';
+            for (const hour of allHours) {
+                let statusClass = '';
+                let statusText = '';
+                let isClosed = closedHours.includes(hour);
+                let isBooked = bookedSlots.includes(hour);
+                let isBreak = breakStart && breakEnd && hour >= breakStart && hour < breakEnd;
+
+                if (isClosed) {
+                    statusClass = 'closed';
+                    statusText = '🔒 Закрыт админом';
+                } else if (isBooked) {
+                    statusClass = 'closed';
+                    statusText = '📅 Занят (есть запись)';
+                } else if (isBreak) {
+                    statusClass = 'break';
+                    statusText = '☕ Перерыв';
+                } else {
+                    statusText = '✅ Открыт';
+                }
+
+                html += `
+                    <div class="hour-slot ${statusClass}" onclick="toggleHour('${hour}')">
+                        <div class="hour-time">${hour}</div>
+                        <div class="hour-status">${statusText}</div>
+                    </div>
+                `;
+            }
+            document.getElementById('hoursGrid').innerHTML = html;
+        }
+
+        function toggleHour(hour) {
+            if (closedHours.includes(hour)) {
+                closedHours = closedHours.filter(h => h !== hour);
+            } else {
+                closedHours.push(hour);
+            }
+            renderGrid();
+        }
+
+        function setBreak() {
+            closedHours = closedHours.filter(h => h !== '14:00' && h !== '15:00');
+            breakStart = '14:00';
+            breakEnd = '15:00';
+            renderGrid();
+        }
+
+        function closeAll() {
+            closedHours = [...allHours];
+            breakStart = null;
+            breakEnd = null;
+            renderGrid();
+        }
+
+        async function saveHours() {
+            await fetch('/api/save-day-hours', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    date: date,
+                    closed_hours: closedHours,
+                    break_start: breakStart,
+                    break_end: breakEnd
+                })
+            });
+            alert('✅ Настройки сохранены!');
+            window.location.href = '/admin';
+        }
+
+        async function copyToWeek() {
+            if (!confirm('Скопировать это расписание на всю следующую неделю?')) return;
+            await fetch('/api/copy-hours-to-week', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    source_date: date,
+                    hours_data: {
+                        closed_hours: closedHours,
+                        break_start: breakStart,
+                        break_end: breakEnd
+                    }
+                })
+            });
+            alert('✅ Расписание скопировано на неделю!');
+        }
+
+        loadHours();
+    </script>
+</body>
+</html>
