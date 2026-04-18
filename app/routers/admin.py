@@ -202,3 +202,50 @@ async def delete_comment(comment_id: int, db: AsyncSession = Depends(get_db)):
     await db.delete(comment)
     await db.commit()
     return {"ok": True}
+
+
+@router.post("/manual-booking")
+async def manual_booking(booking_data: dict, db: AsyncSession = Depends(get_db)):
+    """Ручное добавление записи админом (через страницу управления часами)"""
+    from datetime import datetime, timedelta
+    from sqlalchemy import select
+
+    booking_date = datetime.fromisoformat(booking_data.get("booking_date"))
+
+    if booking_date <= datetime.now():
+        raise HTTPException(400, "Дата должна быть в будущем")
+
+    # Длительность услуг
+    SERVICE_DURATION = {
+        "lashes": 2.5,
+        "brows": 1.0,
+        "complex": 3.0
+    }
+    duration = SERVICE_DURATION.get(booking_data.get("service_type"), 1.0)
+    booking_end = booking_date + timedelta(hours=duration)
+
+    # Проверяем пересечения с существующими записями
+    existing_bookings = await db.execute(
+        select(Booking).where(
+            Booking.booking_date >= booking_date - timedelta(hours=3),
+            Booking.booking_date <= booking_end,
+            Booking.status.in_(['pending', 'confirmed'])
+        )
+    )
+    for existing in existing_bookings.scalars().all():
+        existing_end = existing.booking_date + timedelta(hours=SERVICE_DURATION.get(existing.service_type, 1.0))
+        if not (booking_date >= existing_end or booking_end <= existing.booking_date):
+            raise HTTPException(400, "Это время уже занято")
+
+    db_booking = Booking(
+        client_name=booking_data.get("client_name"),
+        client_phone=booking_data.get("client_phone"),
+        service_type=booking_data.get("service_type"),
+        booking_date=booking_date,
+        status="confirmed",  # админ подтверждает сразу
+        notes=booking_data.get("comment", "")
+    )
+    db.add(db_booking)
+    await db.commit()
+    await db.refresh(db_booking)
+    return {"ok": True, "id": db_booking.id}

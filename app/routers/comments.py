@@ -74,3 +74,23 @@ async def delete_comment(comment_id: int, db: AsyncSession = Depends(get_db)):
     await db.delete(comment)
     await db.commit()
     return {"ok": True}
+
+
+@router.get("/all")
+async def get_all_comments(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Comment).order_by(Comment.created_at.desc()))
+    return result.scalars().all()
+
+@router.put("/{comment_id}")
+async def update_comment(comment_id: int, comment_data: dict, db: AsyncSession = Depends(get_db)):
+    comment = await db.get(Comment, comment_id)
+    if not comment:
+        raise HTTPException(404, "Комментарий не найден")
+    if "text" in comment_data:
+        comment.text = comment_data["text"]
+    if "rating" in comment_data:
+        comment.rating = comment_data["rating"]
+    if "emoji" in comment_data:
+        comment.emoji = comment_data["emoji"]
+    await db.commit()
+    return {"ok": True}
