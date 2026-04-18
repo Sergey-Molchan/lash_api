@@ -27,6 +27,7 @@
         .contact{padding:80px 0}
         .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px}
         .map-container{height:350px;border-radius:20px;overflow:hidden}
+        .map-container iframe{width:100%;height:100%;border:none}
         .reviews{padding:80px 0;background:#f8f9ff}
         .review-card{background:white;border-radius:20px;padding:20px;margin-bottom:20px;box-shadow:0 5px 15px rgba(0,0,0,0.05)}
         .review-emoji{font-size:30px}
@@ -40,33 +41,166 @@
         .emoji-selector{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
         .emoji-option{font-size:24px;cursor:pointer;padding:5px;border-radius:10px}
         .emoji-option:hover{background:#f0f0f0}
-        .emoji-option.selected{background:#e94560}
         .rating-stars{display:flex;gap:5px;margin-bottom:15px}
         .rating-star{font-size:30px;cursor:pointer;color:#ddd}
         .rating-star.active{color:#ff9800}
         .footer{background:#1a1a2e;color:white;padding:40px 0;text-align:center}
+        .taxi-btn{display:inline-block;background:#ff9800;color:white;padding:12px 30px;border-radius:50px;text-decoration:none;font-weight:600;margin-top:20px;margin-right:10px}
+        .call-btn{display:inline-block;background:#4caf50;color:white;padding:12px 30px;border-radius:50px;text-decoration:none;font-weight:600;margin-top:20px}
         @media(max-width:768px){.hero h1{font-size:32px}.contact-grid{grid-template-columns:1fr}.nav{display:none}}
+        .emoji-option.selected { background: #e94560; color: white; }
     </style>
 </head>
 <body>
 <header class="header"><div class="container header-inner"><div class="logo">Lash <span>Studio</span></div><div class="nav"><a href="#services">Услуги</a><a href="/portfolio">Портфолио</a><a href="#contact">Контакты</a><a href="/booking" class="btn-book">Записаться</a></div></div></header>
 <section class="hero"><div class="container"><h1 id="heroTitle">✨ Идеальный взгляд начинается здесь</h1><p id="heroText">Наращивание ресниц и ламинирование бровей в Адлере</p><a href="/booking" class="hero-btn">Записаться сейчас</a></div></section>
 <section id="services" class="services"><div class="container"><h2 class="section-title">Наши услуги</h2><div class="services-grid" id="servicesGrid"></div></div></section>
-<section id="reviews" class="reviews"><div class="container"><h2 class="section-title">Отзывы клиентов</h2><div id="reviewsList"></div><div class="add-review"><h3>💬 Оставить отзыв</h3><div class="rating-stars" id="ratingStars"><span class="rating-star" data-rating="1">☆</span><span class="rating-star" data-rating="2">☆</span><span class="rating-star" data-rating="3">☆</span><span class="rating-star" data-rating="4">☆</span><span class="rating-star" data-rating="5">☆</span></div><input type="text" id="reviewName" placeholder="Ваше имя"><input type="tel" id="reviewPhone" placeholder="Телефон"><div class="emoji-selector" id="emojiSelector"><span class="emoji-option">😊</span><span class="emoji-option">😍</span><span class="emoji-option">🥰</span><span class="emoji-option">😘</span><span class="emoji-option">👍</span><span class="emoji-option">🔥</span><span class="emoji-option">💖</span><span class="emoji-option">✨</span><span class="emoji-option">💯</span><span class="emoji-option">😎</span><span class="emoji-option">🤩</span><span class="emoji-option">💪</span></div><textarea id="reviewText" rows="4" placeholder="Ваш отзыв..."></textarea><button onclick="submitReview()">Отправить отзыв</button></div></div></section>
-<section id="contact" class="contact"><div class="container"><h2 class="section-title">Контакты</h2><div class="contact-grid"><div><h3>Как нас найти</h3><p id="address">📍 улица Голубые Дали, 78, Адлер</p><p id="phone">📞 +7 (928) 960-19-62</p><a href="https://yandex.ru/maps/?pt=39.911025,43.452585&z=17&l=map" target="_blank" style="background:#2196f3;color:white;padding:12px 30px;border-radius:50px;text-decoration:none;display:inline-block;margin-top:20px">🗺️ Открыть карту</a><a href="tel:+79289601962" style="background:#4caf50;color:white;padding:12px 30px;border-radius:50px;text-decoration:none;display:inline-block;margin-top:20px;margin-left:10px">📞 Позвонить</a></div><div class="map-container"><iframe src="https://yandex.ru/map-widget/v1/?pt=39.911025,43.452585&z=17&l=map" width="100%" height="100%" frameborder="0"></iframe></div></div></div></section>
+<section id="reviews" class="reviews"><div class="container"><h2 class="section-title">Отзывы клиентов</h2><div id="reviewsList"></div><div class="add-review"><h3>💬 Оставить отзыв</h3><div class="rating-stars" id="ratingStars"><span class="rating-star" data-rating="1">☆</span><span class="rating-star" data-rating="2">☆</span><span class="rating-star" data-rating="3">☆</span><span class="rating-star" data-rating="4">☆</span><span class="rating-star" data-rating="5">☆</span></div><input type="text" id="reviewName" placeholder="Ваше имя"><input type="tel" id="reviewPhone" placeholder="Телефон"><div class="emoji-selector" id="emojiSelector"><span class="emoji-option">😊</span><span class="emoji-option">😍</span><span class="emoji-option">🥰</span><span class="emoji-option">😘</span><span class="emoji-option">👍</span><span class="emoji-option">🔥</span><span class="emoji-option">💖</span><span class="emoji-option">✨</span><span class="emoji-option">💯</span><span class="emoji-option">😎</span><span class="emoji-option">🤩</span><span class="emoji-option">💪</span></div><textarea id="reviewText" rows="4" placeholder="Ваш отзыв..."></textarea><button id="submitReviewBtn">Отправить отзыв</button></div></div></section>
+<section id="contact" class="contact"><div class="container"><h2 class="section-title">Контакты</h2><div class="contact-grid"><div><h3>Как нас найти</h3><p id="address">📍 улица Голубые Дали, 78, жилой район Адлер, Сочи, Краснодарский край, 354382</p><p id="phone">📞 +7 (928) 960-19-62</p><a href="https://yandex.ru/maps/239/sochi/house/ulitsa_golubyye_dali_78/Z0AYfwZhSUcCQFppfXh0c3lrYQ==/?ll=39.911025%2C43.452585&z=16.9" class="taxi-btn" target="_blank" style="background:#2196f3">🗺️ Открыть карту</a><a href="https://taxi.yandex.ru/ru_ru/" class="taxi-btn" target="_blank">🚕 Вызвать такси</a><a href="tel:+79289601962" class="call-btn" target="_blank">📞 Позвонить</a></div><div class="map-container"><iframe src="https://yandex.ru/map-widget/v1/?pt=39.911025,43.452585&z=17&l=map" width="100%" height="100%" frameborder="0"></iframe></div></div></div></section>
 <footer class="footer"><div class="container"><p>© 2026 Lash Studio. Все права защищены.</p></div></footer>
 <script>
+// Глобальные переменные для выбранных значений
 let selectedRating = 5;
 let selectedEmoji = '😊';
-document.querySelectorAll('.rating-star').forEach(star => {star.onclick = () => {let rating = parseInt(star.dataset.rating);selectedRating = rating;document.querySelectorAll('.rating-star').forEach((s,i)=>{s.innerHTML = i < rating ? '★' : '☆';});};});
-document.querySelectorAll('.emoji-option').forEach(emoji => {emoji.onclick = () => {document.querySelectorAll('.emoji-option').forEach(e=>e.classList.remove('selected'));emoji.classList.add('selected');selectedEmoji = emoji.innerText;};});
-document.querySelectorAll('.emoji-option')[0].classList.add('selected');
 
-async function loadPrices(){const res=await fetch('/api/prices');const p=await res.json();document.getElementById('servicesGrid').innerHTML=`<div class="service-card"><div class="service-img" style="background-image:url('https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=400')"></div><div class="service-content"><h3>Наращивание ресниц</h3><div class="price">от ${p.lashes} ₽</div><a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a></div></div><div class="service-card"><div class="service-img" style="background-image:url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400')"></div><div class="service-content"><h3>Ламинирование бровей</h3><div class="price">от ${p.brows} ₽</div><a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a></div></div><div class="service-card"><div class="service-img" style="background-image:url('https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400')"></div><div class="service-content"><h3>Комплекс: Ресницы + Брови</h3><div class="price">${p.complex} ₽</div><a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a></div></div>`;}
-async function loadReviews(){const res=await fetch('/api/comments/approved');const reviews=await res.json();let html='';for(const r of reviews){const stars='★'.repeat(r.rating)+'☆'.repeat(5-r.rating);html+=`<div class="review-card"><div class="review-emoji">${r.emoji}</div><div class="review-rating">${stars}</div><div class="review-text">${escapeHtml(r.text)}</div><div class="review-author">— ${escapeHtml(r.client_name)}</div></div>`;}document.getElementById('reviewsList').innerHTML=html||'<p>Пока нет отзывов. Будьте первым!</p>';}
-async function submitReview(){const name=document.getElementById('reviewName').value.trim();const phone=document.getElementById('reviewPhone').value.trim();const text=document.getElementById('reviewText').value.trim();if(!name||!phone||!text){alert('Заполните все поля');return;}if(text.length<5){alert('Отзыв слишком короткий');return;}const res=await fetch('/api/comments/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_name:name,client_phone:phone,rating:selectedRating,text:text,emoji:selectedEmoji})});if(res.ok){alert('Спасибо за отзыв! Он будет опубликован после проверки.');document.getElementById('reviewName').value='';document.getElementById('reviewPhone').value='';document.getElementById('reviewText').value='';loadReviews();}else{alert('Ошибка при отправке');}}
-function escapeHtml(text){if(!text)return '';const div=document.createElement('div');div.textContent=text;return div.innerHTML;}
-loadPrices();loadReviews();
+// Инициализация звёзд и эмодзи после полной загрузки DOM
+document.addEventListener('DOMContentLoaded', function() {
+    // Звёзды
+    const stars = document.querySelectorAll('.rating-star');
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.dataset.rating);
+            selectedRating = rating;
+            stars.forEach((s, i) => {
+                s.innerHTML = i < rating ? '★' : '☆';
+            });
+        });
+    });
+    // Устанавливаем начальное состояние (5 звёзд)
+    stars.forEach((s, i) => {
+        s.innerHTML = i < 5 ? '★' : '☆';
+    });
+
+    // Эмодзи
+    const emojis = document.querySelectorAll('.emoji-option');
+    emojis.forEach(emoji => {
+        emoji.addEventListener('click', function() {
+            emojis.forEach(e => e.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedEmoji = this.innerText;
+        });
+    });
+    if (emojis.length) emojis[0].classList.add('selected');
+
+    // Кнопка отправки отзыва
+    document.getElementById('submitReviewBtn').addEventListener('click', submitReview);
+});
+
+// Загрузка цен и фото услуг
+async function loadPricesAndImages() {
+    const [pricesRes, contentRes] = await Promise.all([
+        fetch('/api/prices'),
+        fetch('/api/content')
+    ]);
+    const p = await pricesRes.json();
+    const c = await contentRes.json();
+
+    document.getElementById('servicesGrid').innerHTML = `
+        <div class="service-card">
+            <div class="service-img" style="background-image: url('${c.service_lashes_img || 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=400'}')"></div>
+            <div class="service-content">
+                <h3>Наращивание ресниц</h3>
+                <div class="price">от ${p.lashes} ₽</div>
+                <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
+            </div>
+        </div>
+        <div class="service-card">
+            <div class="service-img" style="background-image: url('${c.service_brows_img || 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400'}')"></div>
+            <div class="service-content">
+                <h3>Ламинирование бровей</h3>
+                <div class="price">от ${p.brows} ₽</div>
+                <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
+            </div>
+        </div>
+        <div class="service-card">
+            <div class="service-img" style="background-image: url('${c.service_complex_img || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400'}')"></div>
+            <div class="service-content">
+                <h3>Комплекс: Ресницы + Брови</h3>
+                <div class="price">${p.complex} ₽</div>
+                <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
+            </div>
+        </div>
+    `;
+}
+
+// Загрузка одобренных отзывов
+async function loadReviews() {
+    const res = await fetch('/api/comments/approved');
+    const reviews = await res.json();
+    let html = '';
+    for (const r of reviews) {
+        const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+        html += `<div class="review-card"><div class="review-emoji">${r.emoji}</div><div class="review-rating">${stars}</div><div class="review-text">${escapeHtml(r.text)}</div><div class="review-author">— ${escapeHtml(r.client_name)}</div></div>`;
+    }
+    document.getElementById('reviewsList').innerHTML = html || '<p>Пока нет отзывов. Будьте первым!</p>';
+}
+
+// Отправка отзыва
+async function submitReview() {
+    const name = document.getElementById('reviewName').value.trim();
+    const phone = document.getElementById('reviewPhone').value.trim();
+    const text = document.getElementById('reviewText').value.trim();
+    if (!name || !phone || !text) {
+        alert('Заполните все поля');
+        return;
+    }
+    if (text.length < 5) {
+        alert('Отзыв слишком короткий');
+        return;
+    }
+    const res = await fetch('/api/comments/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            client_name: name,
+            client_phone: phone,
+            rating: selectedRating,
+            text: text,
+            emoji: selectedEmoji
+        })
+    });
+    if (res.ok) {
+        alert('Спасибо за отзыв! Он будет опубликован после проверки.');
+        document.getElementById('reviewName').value = '';
+        document.getElementById('reviewPhone').value = '';
+        document.getElementById('reviewText').value = '';
+        loadReviews();
+    } else {
+        alert('Ошибка при отправке');
+    }
+}
+
+// Загрузка контента (адрес, телефон и т.д.)
+async function loadContent() {
+    const res = await fetch('/api/content');
+    const c = await res.json();
+    document.getElementById('heroTitle').innerText = c.hero_title || '✨ Идеальный взгляд начинается здесь';
+    document.getElementById('heroText').innerText = c.hero_text || 'Наращивание ресниц и ламинирование бровей в Адлере';
+    document.getElementById('address').innerHTML = c.address || '📍 улица Голубые Дали, 78, жилой район Адлер, Сочи, Краснодарский край, 354382';
+    document.getElementById('phone').innerHTML = c.phone || '+7 (928) 960-19-62';
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Запуск всех загрузок
+loadPricesAndImages();
+loadReviews();
+loadContent();
 </script>
 </body>
 </html>

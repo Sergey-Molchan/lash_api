@@ -88,10 +88,32 @@
     <div class="form-group"><label>О нас:</label><textarea id="about" rows="4"></textarea></div>
     <div class="form-group"><label>Адрес:</label><textarea id="address" rows="2"></textarea></div>
     <button class="btn-primary" onclick="saveContent()">💾 Сохранить все</button>
+    <div class="form-group">
+    <label>Фото для «Наращивание ресниц» (URL)</label>
+    <input type="text" id="service_lashes_img" placeholder="/static/uploads/lashes.jpg">
+</div>
+<div class="form-group">
+    <label>Фото для «Ламинирование бровей» (URL)</label>
+    <input type="text" id="service_brows_img" placeholder="/static/uploads/brows.jpg">
+</div>
+<div class="form-group">
+    <label>Фото для «Комплекс» (URL)</label>
+    <input type="text" id="service_complex_img" placeholder="/static/uploads/complex.jpg">
+</div>
 </div>
 <div id="tab-gallery" class="tab-content">
     <h3>🖼️ Управление галереей</h3>
-    <div class="upload-area" onclick="document.getElementById('fileInput').click()"><p>📸 Нажмите или перетащите фото для загрузки</p><input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="uploadFiles(this.files)"></div>
+    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+        <p>📸 Нажмите или перетащите фото для загрузки</p>
+        <input type="file" id="fileInput" accept="image/*" style="display:none">
+    </div>
+    <div style="margin-top:15px;">
+        <label>Название (необязательно):</label>
+        <input type="text" id="imageTitle" style="width:100%; margin-bottom:10px;">
+        <label>Описание (необязательно):</label>
+        <textarea id="imageDescription" rows="2" style="width:100%;"></textarea>
+        <button class="btn-primary" onclick="uploadWithDetails()">📤 Загрузить с описанием</button>
+    </div>
     <div id="gallery-list" class="gallery-grid"></div>
 </div>
 <div id="tab-comments" class="tab-content">
@@ -216,6 +238,10 @@ async function loadContent() {
     document.getElementById('hero_text').value = c.hero_text || '';
     document.getElementById('about').value = c.about || '';
     document.getElementById('address').value = c.address || '';
+    // новые поля
+    document.getElementById('service_lashes_img').value = c.service_lashes_img || '';
+    document.getElementById('service_brows_img').value = c.service_brows_img || '';
+    document.getElementById('service_complex_img').value = c.service_complex_img || '';
 }
 
 async function saveContent() {
@@ -223,6 +249,10 @@ async function saveContent() {
     await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'hero_text', content: document.getElementById('hero_text').value }) });
     await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'about', content: document.getElementById('about').value }) });
     await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'address', content: document.getElementById('address').value }) });
+    // новые поля
+    await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'service_lashes_img', content: document.getElementById('service_lashes_img').value }) });
+    await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'service_brows_img', content: document.getElementById('service_brows_img').value }) });
+    await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'service_complex_img', content: document.getElementById('service_complex_img').value }) });
     alert('Сохранено');
 }
 
@@ -231,7 +261,12 @@ async function loadGallery() {
     const images = await res.json();
     let html = '';
     for (const img of images) {
-        html += `<div class="gallery-item"><img src="${img.url}" onerror="this.src='https://via.placeholder.com/150'"><p>${escapeHtml(img.title || '')}</p><button class="delete-img" onclick="deleteImage(${img.id})">✖</button></div>`;
+        const displayText = img.description || img.title || '';
+        html += `<div class="gallery-item">
+            <img src="${img.url}" onerror="this.src='https://via.placeholder.com/150'">
+            <p>${escapeHtml(displayText)}</p>
+            <button class="delete-img" onclick="deleteImage(${img.id})">✖</button>
+        </div>`;
     }
     document.getElementById('gallery-list').innerHTML = html || '<p>Нет фото</p>';
 }
@@ -244,7 +279,35 @@ async function uploadFiles(files) {
     }
     loadGallery();
 }
+async function uploadWithDetails() {
+    const fileInput = document.getElementById('fileInput');
+    const title = document.getElementById('imageTitle').value;
+    const description = document.getElementById('imageDescription').value;
 
+    if (!fileInput.files || !fileInput.files.length) {
+        alert('Выберите файл');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+    if (title) formData.append('title', title);
+    if (description) formData.append('description', description);
+
+    const res = await fetch('/api/gallery/upload', {
+        method: 'POST',
+        body: formData
+    });
+    if (res.ok) {
+        alert('✅ Фото загружено');
+        document.getElementById('imageTitle').value = '';
+        document.getElementById('imageDescription').value = '';
+        fileInput.value = '';
+        loadGallery();
+    } else {
+        alert('❌ Ошибка загрузки');
+    }
+}
 async function deleteImage(id) {
     if (!confirm('Удалить фото?')) return;
     await fetch(`/api/gallery/${id}`, { method: 'DELETE' });
