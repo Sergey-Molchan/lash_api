@@ -14,7 +14,17 @@ async def get_site_content(db: AsyncSession = Depends(get_db)):
         "hero_title": content.get("hero_title", "✨ Идеальный взгляд начинается здесь"),
         "hero_text": content.get("hero_text", "Наращивание ресниц и ламинирование бровей в Адлере"),
         "about": content.get("about", "Lash Studio — уютная студия красоты в Адлере"),
-        "address": content.get("address", "📍 улица Голубые Дали, 78, Адлер")
+        "address": content.get("address", "📍 улица Голубые Дали, 78, Адлер"),
+        "hero_title": content.get("hero_title", "✨ Идеальный взгляд начинается здесь"),
+        "hero_text": content.get("hero_text", "Наращивание ресниц и ламинирование бровей в Адлере"),
+        "about": content.get("about", "Lash Studio — уютная студия красоты в Адлере"),
+        "address": content.get("address", "📍 улица Голубые Дали, 78, Адлер"),
+        "service_lashes_img": content.get("service_lashes_img",
+                                          "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=400"),
+        "service_brows_img": content.get("service_brows_img",
+                                         "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400"),
+        "service_complex_img": content.get("service_complex_img",
+                                           "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400")
     }
 
 @router.post("/")
