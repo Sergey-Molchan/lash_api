@@ -5,9 +5,6 @@ from fastapi.responses import HTMLResponse
 from app.database import init_db
 from app.routers import admin, client, calendar, hours, prices, content, gallery, comments, finance, notifications
 import os
-import asyncio
-from app.workers.sms_worker import SMSWorker
-from app.redis_client import get_redis, close_redis
 
 app = FastAPI(title="Lash Studio API")
 
@@ -59,25 +56,13 @@ async def admin_redirect():
 async def hours_page():
     return read_html("app/templates/hours.html")
 
-# Глобальная переменная для воркера
-sms_worker = None
-
 @app.on_event("startup")
 async def startup():
     await init_db()
-    # Запускаем SMS воркера
-    global sms_worker
-    redis_client = await get_redis()
-    sms_worker = SMSWorker(redis_client)
-    asyncio.create_task(sms_worker.run())
-    print("✅ App started with SMS worker")
+    print("✅ App started (SMS worker disabled)")
 
 @app.on_event("shutdown")
 async def shutdown():
-    global sms_worker
-    if sms_worker:
-        sms_worker.stop()
-    await close_redis()
     print("👋 App shutdown")
 
 @app.get("/health")
