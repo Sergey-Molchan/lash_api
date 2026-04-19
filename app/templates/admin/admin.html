@@ -27,6 +27,8 @@
         .btn-primary{background:#2196f3;color:white}
         .btn-warning{background:#ff9800;color:white}
         .btn-secondary{background:#6c757d;color:white}
+        .btn-info{background:#17a2b8;color:white}
+        .btn-info:hover{background:#138496}
         .filter-btn{padding:6px 12px;margin-right:8px;background:#e9ecef;border:none;border-radius:20px;cursor:pointer}
         .filter-btn.active{background:#4CAF50;color:white}
         .price-row{display:flex;align-items:center;gap:15px;margin-bottom:15px}
@@ -203,7 +205,7 @@ function filterBookings(status) {
         if (btn.dataset.status === status) btn.classList.add('active');
     });
     let filtered = (status === 'all') ? allBookings : allBookings.filter(b => b.status === status);
-    let html = '<table class="bookings-table"><thead><tr><th>ID</th><th>Клиент</th><th>Телефон</th><th>Услуга</th><th>Дата</th><th>Статус</th><th>Оплата</th><th></th></tr></thead><tbody>';
+    let html = '<table class="bookings-table"><thead><tr><th>ID</th><th>Клиент</th><th>Телефон</th><th>Услуга</th><th>Дата</th><th>Статус</th><th>Оплата</th><th>Уведомления</th><th></th></tr></thead><tbody>';
     for (const b of filtered) {
         const service = b.service_type === 'lashes' ? 'Ресницы' : (b.service_type === 'brows' ? 'Брови' : 'Комплекс');
         html += `<tr>
@@ -214,11 +216,24 @@ function filterBookings(status) {
             <td>${new Date(b.booking_date).toLocaleString()}</td>
             <td class="status-${b.status}">${b.status}</td>
             <td>${b.paid ? '✅ Оплачено' : '❌ Не оплачено'}</td>
+            <td>
+                <button class="btn-info" onclick="sendNotification(${b.id}, 'booking_confirmed')">📱 Подтв</button>
+                <button class="btn-info" onclick="sendNotification(${b.id}, 'booking_reminder')">⏰ Напом</button>
+            </td>
             <td><button class="btn-success" onclick="confirmBooking(${b.id})">✅</button><button class="btn-danger" onclick="cancelBooking(${b.id})">❌</button><button class="btn-warning" onclick="deleteBooking(${b.id})">🗑️</button></td>
         </tr>`;
     }
     html += '</tbody></table>';
     document.getElementById('bookings-container').innerHTML = html;
+}
+
+async function sendNotification(bookingId, type) {
+    const res = await fetch(`/api/notifications/send/${bookingId}/${type}`, { method: 'POST' });
+    if (res.ok) {
+        alert('✅ Уведомление отправлено в очередь');
+    } else {
+        alert('❌ Ошибка отправки');
+    }
 }
 
 async function confirmBooking(id) {

@@ -3,8 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from app.database import init_db
-from app.routers import admin, client, calendar, hours, prices, content, gallery, comments, finance
+from app.routers import admin, client, calendar, hours, prices, content, gallery, comments, finance, notifications
 import os
+import asyncio
+from app.workers.sms_worker import SMSWorker
+from app.redis_client import get_redis, close_redis
 
 app = FastAPI(title="Lash Studio API")
 
@@ -19,6 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Подключаем роутеры
 app.include_router(admin.router)
 app.include_router(client.router)
 app.include_router(calendar.router)
@@ -28,6 +32,7 @@ app.include_router(content.router)
 app.include_router(gallery.router)
 app.include_router(comments.router)
 app.include_router(finance.router)
+app.include_router(notifications.router)
 
 def read_html(filepath):
     with open(filepath, "r", encoding="utf-8") as f:
@@ -54,10 +59,26 @@ async def admin_redirect():
 async def hours_page():
     return read_html("app/templates/hours.html")
 
+# Глобальная переменная для воркера
+sms_worker = None
+
 @app.on_event("startup")
 async def startup():
     await init_db()
-    print("✅ App started")
+    # Запускаем SMS воркера
+    global sms_worker
+    redis_client = await get_redis()
+    sms_worker = SMSWorker(redis_client)
+    asyncio.create_task(sms_worker.run())
+    print("✅ App started with SMS worker")
+
+@app.on_event("shutdown")
+async def shutdown():
+    global sms_worker
+    if sms_worker:
+        sms_worker.stop()
+    await close_redis()
+    print("👋 App shutdown")
 
 @app.get("/health")
 async def health():
