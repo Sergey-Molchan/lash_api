@@ -26,6 +26,7 @@
         .btn-danger{background:#f44336;color:white}
         .btn-primary{background:#2196f3;color:white}
         .btn-warning{background:#ff9800;color:white}
+        .btn-secondary{background:#6c757d;color:white}
         .filter-btn{padding:6px 12px;margin-right:8px;background:#e9ecef;border:none;border-radius:20px;cursor:pointer}
         .filter-btn.active{background:#4CAF50;color:white}
         .price-row{display:flex;align-items:center;gap:15px;margin-bottom:15px}
@@ -135,8 +136,25 @@
 
 <div id="tab-finance" class="tab-content">
     <h3>📊 Финансовая статистика</h3>
-    <div class="finance-stats" id="financeStats"></div>
+    <div style="margin-bottom:20px;">
+        <label for="financeYearSelect">Год: </label>
+        <select id="financeYearSelect" onchange="loadFinance()">
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+        </select>
+        <label for="financeMonthSelect" style="margin-left:15px;">Месяц: </label>
+        <select id="financeMonthSelect" onchange="loadFinance()">
+            <option value="1">Январь</option><option value="2">Февраль</option><option value="3">Март</option>
+            <option value="4">Апрель</option><option value="5">Май</option><option value="6">Июнь</option>
+            <option value="7">Июль</option><option value="8">Август</option><option value="9">Сентябрь</option>
+            <option value="10">Октябрь</option><option value="11">Ноябрь</option><option value="12">Декабрь</option>
+        </select>
+        <button class="btn-primary" onclick="loadFinance()">Показать</button>
+        <button class="btn-secondary" onclick="loadMonthlyStats()" style="margin-left:10px;">📈 Годовая статистика</button>
+    </div>
+    <div id="financeStats"></div>
     <div id="financeDetails"></div>
+    <div id="monthlyChart" style="margin-top:30px;"></div>
 </div>
 
 <script>
@@ -184,7 +202,6 @@ function filterBookings(status) {
         btn.classList.remove('active');
         if (btn.dataset.status === status) btn.classList.add('active');
     });
-
     let filtered = (status === 'all') ? allBookings : allBookings.filter(b => b.status === status);
     let html = '<table class="bookings-table"><thead><tr><th>ID</th><th>Клиент</th><th>Телефон</th><th>Услуга</th><th>Дата</th><th>Статус</th><th>Оплата</th><th></th></tr></thead><tbody>';
     for (const b of filtered) {
@@ -363,14 +380,16 @@ async function deleteComment(id) {
 }
 
 async function loadFinance() {
-    const year = new Date().getFullYear();
-    const month = new Date().getMonth() + 1;
+    const year = document.getElementById('financeYearSelect').value;
+    const month = document.getElementById('financeMonthSelect').value;
     const res = await fetch(`/api/finance/month/${year}/${month}`);
     const data = await res.json();
     document.getElementById('financeStats').innerHTML = `
-        <div class="finance-stat"><h3>📝 Всего записей</h3><div class="value">${data.total_bookings}</div></div>
-        <div class="finance-stat"><h3>💰 Общая выручка</h3><div class="value">${data.total_amount.toLocaleString()} ₽</div></div>
-        <div class="finance-stat"><h3>💵 Средний чек</h3><div class="value">${Math.round(data.total_amount / data.total_bookings || 0).toLocaleString()} ₽</div></div>
+        <div class="finance-stats">
+            <div class="finance-stat"><h3>📝 Всего записей</h3><div class="value">${data.total_bookings}</div></div>
+            <div class="finance-stat"><h3>💰 Общая выручка</h3><div class="value">${data.total_amount.toLocaleString()} ₽</div></div>
+            <div class="finance-stat"><h3>💵 Средний чек</h3><div class="value">${Math.round(data.total_amount / data.total_bookings || 0).toLocaleString()} ₽</div></div>
+        </div>
     `;
     let detailsHtml = '<h4 style="margin-top:20px">📋 Детали по услугам:</h4><table class="bookings-table"><thead><tr><th>Услуга</th><th>Количество</th><th>Выручка</th></tr></thead><tbody>';
     for (const [key, service] of Object.entries(data.service_stats)) {
@@ -378,6 +397,26 @@ async function loadFinance() {
     }
     detailsHtml += '</tbody></table>';
     document.getElementById('financeDetails').innerHTML = detailsHtml;
+    document.getElementById('monthlyChart').innerHTML = '';
+}
+
+async function loadMonthlyStats() {
+    const res = await fetch('/api/finance/monthly');
+    const data = await res.json();
+    if (!data.months.length) {
+        document.getElementById('monthlyChart').innerHTML = '<p>Нет данных для отображения</p>';
+        return;
+    }
+    let html = '<h4>📈 Помесячная статистика</h4><table class="bookings-table"><thead><tr><th>Месяц</th><th>Количество записей</th><th>Выручка</th></tr></thead><tbody>';
+    for (let i = 0; i < data.months.length; i++) {
+        html += `<tr>
+            <td>${data.months[i]}</td>
+            <td>${data.counts[i]} шт</td>
+            <td>${data.revenues[i].toLocaleString()} ₽</td>
+        </tr>`;
+    }
+    html += '</tbody></table>';
+    document.getElementById('monthlyChart').innerHTML = html;
 }
 
 function escapeHtml(text) {
