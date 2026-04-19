@@ -26,6 +26,8 @@
         .btn-danger{background:#f44336;color:white}
         .btn-primary{background:#2196f3;color:white}
         .btn-warning{background:#ff9800;color:white}
+        .filter-btn{padding:6px 12px;margin-right:8px;background:#e9ecef;border:none;border-radius:20px;cursor:pointer}
+        .filter-btn.active{background:#4CAF50;color:white}
         .price-row{display:flex;align-items:center;gap:15px;margin-bottom:15px}
         .price-row input{width:120px;padding:8px;border:1px solid #ddd;border-radius:5px}
         .form-group{margin-bottom:15px}
@@ -73,7 +75,18 @@
 </div>
 
 <div id="tab-calendar" class="tab-content active"><div id="calendar-container">Загрузка...</div></div>
-<div id="tab-bookings" class="tab-content"><div id="bookings">Загрузка...</div></div>
+
+<div id="tab-bookings" class="tab-content">
+    <div style="margin-bottom:15px;">
+        <button class="filter-btn active" data-status="all" onclick="filterBookings('all')">📋 Все</button>
+        <button class="filter-btn" data-status="confirmed" onclick="filterBookings('confirmed')">✅ Подтверждённые</button>
+        <button class="filter-btn" data-status="pending" onclick="filterBookings('pending')">⏳ Ожидают</button>
+        <button class="filter-btn" data-status="cancelled" onclick="filterBookings('cancelled')">❌ Отменённые</button>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="loadBookings()" style="margin-bottom:15px;">🔄 Обновить</button>
+    <div id="bookings-container">Загрузка...</div>
+</div>
+
 <div id="tab-prices" class="tab-content">
     <h3>💰 Управление ценами</h3>
     <div class="price-row"><span style="width:150px;">Наращивание ресниц:</span><input type="number" id="priceLashes"> ₽<button class="btn-primary" onclick="savePrice('lashes')">Сохранить</button></div>
@@ -81,6 +94,7 @@
     <div class="price-row"><span style="width:150px;">Комплекс (ресницы+брови):</span><input type="number" id="priceComplex"> ₽<button class="btn-primary" onclick="savePrice('complex')">Сохранить</button></div>
     <div class="price-row"><span style="width:150px;">Предоплата (бронь):</span><input type="number" id="priceDeposit"> ₽<button class="btn-primary" onclick="savePrice('deposit')">Сохранить</button></div>
 </div>
+
 <div id="tab-content" class="tab-content">
     <h3>📝 Редактирование главной страницы</h3>
     <div class="form-group"><label>Заголовок героя:</label><textarea id="hero_title" rows="2"></textarea></div>
@@ -88,19 +102,11 @@
     <div class="form-group"><label>О нас:</label><textarea id="about" rows="4"></textarea></div>
     <div class="form-group"><label>Адрес:</label><textarea id="address" rows="2"></textarea></div>
     <button class="btn-primary" onclick="saveContent()">💾 Сохранить все</button>
-    <div class="form-group">
-    <label>Фото для «Наращивание ресниц» (URL)</label>
-    <input type="text" id="service_lashes_img" placeholder="/static/uploads/lashes.jpg">
+    <div class="form-group"><label>Фото для «Наращивание ресниц» (URL)</label><input type="text" id="service_lashes_img" placeholder="/static/uploads/lashes.jpg"></div>
+    <div class="form-group"><label>Фото для «Ламинирование бровей» (URL)</label><input type="text" id="service_brows_img" placeholder="/static/uploads/brows.jpg"></div>
+    <div class="form-group"><label>Фото для «Комплекс» (URL)</label><input type="text" id="service_complex_img" placeholder="/static/uploads/complex.jpg"></div>
 </div>
-<div class="form-group">
-    <label>Фото для «Ламинирование бровей» (URL)</label>
-    <input type="text" id="service_brows_img" placeholder="/static/uploads/brows.jpg">
-</div>
-<div class="form-group">
-    <label>Фото для «Комплекс» (URL)</label>
-    <input type="text" id="service_complex_img" placeholder="/static/uploads/complex.jpg">
-</div>
-</div>
+
 <div id="tab-gallery" class="tab-content">
     <h3>🖼️ Управление галереей</h3>
     <div class="upload-area" onclick="document.getElementById('fileInput').click()">
@@ -116,6 +122,7 @@
     </div>
     <div id="gallery-list" class="gallery-grid"></div>
 </div>
+
 <div id="tab-comments" class="tab-content">
     <h3>💬 Отзывы клиентов</h3>
     <div class="comment-tabs" style="display:flex; gap:10px; margin-bottom:20px;">
@@ -125,6 +132,7 @@
     </div>
     <div id="comments-list">Загрузка...</div>
 </div>
+
 <div id="tab-finance" class="tab-content">
     <h3>📊 Финансовая статистика</h3>
     <div class="finance-stats" id="financeStats"></div>
@@ -134,6 +142,8 @@
 <script>
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth() + 1;
+let allBookings = [];
+let currentFilter = 'all';
 
 function showTab(tabName) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -164,9 +174,20 @@ async function loadCalendar() {
 
 async function loadBookings() {
     const res = await fetch('/api/admin/bookings');
-    const bookings = await res.json();
+    allBookings = await res.json();
+    filterBookings(currentFilter);
+}
+
+function filterBookings(status) {
+    currentFilter = status;
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.status === status) btn.classList.add('active');
+    });
+
+    let filtered = (status === 'all') ? allBookings : allBookings.filter(b => b.status === status);
     let html = '<table class="bookings-table"><thead><tr><th>ID</th><th>Клиент</th><th>Телефон</th><th>Услуга</th><th>Дата</th><th>Статус</th><th>Оплата</th><th></th></tr></thead><tbody>';
-    for (const b of bookings) {
+    for (const b of filtered) {
         const service = b.service_type === 'lashes' ? 'Ресницы' : (b.service_type === 'brows' ? 'Брови' : 'Комплекс');
         html += `<tr>
             <td>${b.id}</td>
@@ -176,11 +197,11 @@ async function loadBookings() {
             <td>${new Date(b.booking_date).toLocaleString()}</td>
             <td class="status-${b.status}">${b.status}</td>
             <td>${b.paid ? '✅ Оплачено' : '❌ Не оплачено'}</td>
-            <td><button class="btn-success" onclick="confirmBooking(${b.id})">✅</button><button class="btn-danger" onclick="cancelBooking(${b.id})">❌</button></td>
+            <td><button class="btn-success" onclick="confirmBooking(${b.id})">✅</button><button class="btn-danger" onclick="cancelBooking(${b.id})">❌</button><button class="btn-warning" onclick="deleteBooking(${b.id})">🗑️</button></td>
         </tr>`;
     }
     html += '</tbody></table>';
-    document.getElementById('bookings').innerHTML = html;
+    document.getElementById('bookings-container').innerHTML = html;
 }
 
 async function confirmBooking(id) {
@@ -192,6 +213,13 @@ async function confirmBooking(id) {
 async function cancelBooking(id) {
     if (!confirm('Отменить запись?')) return;
     await fetch(`/api/admin/cancel/${id}`, { method: 'POST' });
+    loadBookings();
+    loadCalendar();
+}
+
+async function deleteBooking(id) {
+    if (!confirm('Удалить запись навсегда?')) return;
+    await fetch(`/api/booking/${id}`, { method: 'DELETE' });
     loadBookings();
     loadCalendar();
 }
@@ -228,11 +256,7 @@ async function loadPrices() {
 
 async function savePrice(service) {
     let price = document.getElementById(`price${service.charAt(0).toUpperCase() + service.slice(1)}`).value;
-    await fetch('/api/prices', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ service, price: parseInt(price) })
-    });
+    await fetch('/api/prices', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ service, price: parseInt(price) }) });
     alert('Сохранено');
 }
 
@@ -243,7 +267,6 @@ async function loadContent() {
     document.getElementById('hero_text').value = c.hero_text || '';
     document.getElementById('about').value = c.about || '';
     document.getElementById('address').value = c.address || '';
-    // новые поля
     document.getElementById('service_lashes_img').value = c.service_lashes_img || '';
     document.getElementById('service_brows_img').value = c.service_brows_img || '';
     document.getElementById('service_complex_img').value = c.service_complex_img || '';
@@ -254,7 +277,6 @@ async function saveContent() {
     await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'hero_text', content: document.getElementById('hero_text').value }) });
     await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'about', content: document.getElementById('about').value }) });
     await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'address', content: document.getElementById('address').value }) });
-    // новые поля
     await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'service_lashes_img', content: document.getElementById('service_lashes_img').value }) });
     await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'service_brows_img', content: document.getElementById('service_brows_img').value }) });
     await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'service_complex_img', content: document.getElementById('service_complex_img').value }) });
@@ -267,52 +289,30 @@ async function loadGallery() {
     let html = '';
     for (const img of images) {
         const displayText = img.description || img.title || '';
-        html += `<div class="gallery-item">
-            <img src="${img.url}" onerror="this.src='https://via.placeholder.com/150'">
-            <p>${escapeHtml(displayText)}</p>
-            <button class="delete-img" onclick="deleteImage(${img.id})">✖</button>
-        </div>`;
+        html += `<div class="gallery-item"><img src="${img.url}" onerror="this.src='https://via.placeholder.com/150'"><p>${escapeHtml(displayText)}</p><button class="delete-img" onclick="deleteImage(${img.id})">✖</button></div>`;
     }
     document.getElementById('gallery-list').innerHTML = html || '<p>Нет фото</p>';
 }
 
-async function uploadFiles(files) {
-    for (const file of files) {
-        const formData = new FormData();
-        formData.append('file', file);
-        await fetch('/api/gallery/upload', { method: 'POST', body: formData });
-    }
-    loadGallery();
-}
 async function uploadWithDetails() {
     const fileInput = document.getElementById('fileInput');
     const title = document.getElementById('imageTitle').value;
     const description = document.getElementById('imageDescription').value;
-
-    if (!fileInput.files || !fileInput.files.length) {
-        alert('Выберите файл');
-        return;
-    }
-
+    if (!fileInput.files || !fileInput.files.length) { alert('Выберите файл'); return; }
     const formData = new FormData();
     formData.append('file', fileInput.files[0]);
     if (title) formData.append('title', title);
     if (description) formData.append('description', description);
-
-    const res = await fetch('/api/gallery/upload', {
-        method: 'POST',
-        body: formData
-    });
+    const res = await fetch('/api/gallery/upload', { method: 'POST', body: formData });
     if (res.ok) {
         alert('✅ Фото загружено');
         document.getElementById('imageTitle').value = '';
         document.getElementById('imageDescription').value = '';
         fileInput.value = '';
         loadGallery();
-    } else {
-        alert('❌ Ошибка загрузки');
-    }
+    } else { alert('❌ Ошибка загрузки'); }
 }
+
 async function deleteImage(id) {
     if (!confirm('Удалить фото?')) return;
     await fetch(`/api/gallery/${id}`, { method: 'DELETE' });
@@ -320,28 +320,24 @@ async function deleteImage(id) {
 }
 
 async function loadComments(type = 'pending') {
-    let url = '/api/admin/comments/pending';
-    if (type === 'approved') url = '/api/admin/comments/approved';
-    if (type === 'all') url = '/api/comments/all';
+    let url = type === 'approved' ? '/api/admin/comments/approved' : (type === 'all' ? '/api/comments/all' : '/api/admin/comments/pending');
     const res = await fetch(url);
     const comments = await res.json();
     let html = '';
     for (const c of comments) {
         const stars = '★'.repeat(c.rating) + '☆'.repeat(5 - c.rating);
-        html += `
-            <div class="comment-item" data-id="${c.id}">
-                <div class="comment-emoji">${c.emoji}</div>
-                <div class="comment-rating">${stars}</div>
-                <p><strong>${escapeHtml(c.client_name)}</strong> (${escapeHtml(c.client_phone)})</p>
-                <div class="comment-text" contenteditable="true">${escapeHtml(c.text)}</div>
-                <small>${new Date(c.created_at).toLocaleString()}</small>
-                <div style="margin-top:10px;">
-                    ${!c.is_approved ? `<button class="btn-success" onclick="approveComment(${c.id})">✅ Одобрить</button>` : ''}
-                    <button class="btn-warning" onclick="editComment(${c.id})">✏️ Редактировать</button>
-                    <button class="btn-danger" onclick="deleteComment(${c.id})">🗑️ Удалить</button>
-                </div>
+        html += `<div class="comment-item" data-id="${c.id}">
+            <div class="comment-emoji">${c.emoji}</div>
+            <div class="comment-rating">${stars}</div>
+            <p><strong>${escapeHtml(c.client_name)}</strong> (${escapeHtml(c.client_phone)})</p>
+            <div class="comment-text" contenteditable="true">${escapeHtml(c.text)}</div>
+            <small>${new Date(c.created_at).toLocaleString()}</small>
+            <div style="margin-top:10px;">
+                ${!c.is_approved ? `<button class="btn-success" onclick="approveComment(${c.id})">✅ Одобрить</button>` : ''}
+                <button class="btn-warning" onclick="editComment(${c.id})">✏️ Редактировать</button>
+                <button class="btn-danger" onclick="deleteComment(${c.id})">🗑️ Удалить</button>
             </div>
-        `;
+        </div>`;
     }
     document.getElementById('comments-list').innerHTML = html || '<p>Нет отзывов</p>';
 }
@@ -350,11 +346,7 @@ async function editComment(id) {
     const div = document.querySelector(`.comment-item[data-id="${id}"] .comment-text`);
     const newText = div.innerText.trim();
     if (!newText) return;
-    await fetch(`/api/comments/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: newText })
-    });
+    await fetch(`/api/comments/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: newText }) });
     alert('Отзыв обновлён');
     loadComments('all');
 }
@@ -375,19 +367,16 @@ async function loadFinance() {
     const month = new Date().getMonth() + 1;
     const res = await fetch(`/api/finance/month/${year}/${month}`);
     const data = await res.json();
-    
     document.getElementById('financeStats').innerHTML = `
         <div class="finance-stat"><h3>📝 Всего записей</h3><div class="value">${data.total_bookings}</div></div>
         <div class="finance-stat"><h3>💰 Общая выручка</h3><div class="value">${data.total_amount.toLocaleString()} ₽</div></div>
         <div class="finance-stat"><h3>💵 Средний чек</h3><div class="value">${Math.round(data.total_amount / data.total_bookings || 0).toLocaleString()} ₽</div></div>
     `;
-    
     let detailsHtml = '<h4 style="margin-top:20px">📋 Детали по услугам:</h4><table class="bookings-table"><thead><tr><th>Услуга</th><th>Количество</th><th>Выручка</th></tr></thead><tbody>';
     for (const [key, service] of Object.entries(data.service_stats)) {
-        const name = service.name;
-        detailsHtml += `<tr><td>${name}</td><td>${service.count} шт</td><td>${service.total.toLocaleString()} ₽</td></tr>`;
+        detailsHtml += `<tr><td>${service.name}</td><td>${service.count} шт</td><td>${service.total.toLocaleString()} ₽</td></tr>`;
     }
-    detailsHtml += '</tbody></td>';
+    detailsHtml += '</tbody></table>';
     document.getElementById('financeDetails').innerHTML = detailsHtml;
 }
 
@@ -399,6 +388,7 @@ function escapeHtml(text) {
 }
 
 loadCalendar();
+loadBookings();
 loadPrices();
 loadContent();
 loadGallery();
