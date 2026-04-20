@@ -322,7 +322,7 @@ async function savePrice(service) {
         alert('Введите корректную цену');
         return;
     }
-    const response = await fetch('/api/prices', {
+    const response = await fetch('/api/prices/', {  // ← ДОБАВЛЕН СЛЕШ В КОНЦЕ!
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ service, price: price })
