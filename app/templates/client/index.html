@@ -150,40 +150,44 @@
 
     // Загрузка цен и фото услуг
     async function loadPricesAndImages() {
-        const [pricesRes, contentRes] = await Promise.all([
-            fetch('/api/prices'),
-            fetch('/api/content')
-        ]);
-        const p = await pricesRes.json();
-        const c = await contentRes.json();
+    const [pricesRes, contentRes] = await Promise.all([
+        fetch('/api/prices'),
+        fetch('/api/content')
+    ]);
+    const p = await pricesRes.json();
+    const c = await contentRes.json();
 
-        document.getElementById('servicesGrid').innerHTML = `
-            <div class="service-card">
-                <div class="service-img" style="background-image: url('${c.service_lashes_img || 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=400'}')"></div>
-                <div class="service-content">
-                    <h3>Наращивание ресниц</h3>
-                    <div class="price">от ${p.lashes} ₽</div>
-                    <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
-                </div>
+    // Находим минимальную цену на ресницы из всех объёмов
+    const lashesPrices = [p.lashes_1d, p.lashes_1_5d, p.lashes_2d, p.lashes_3d].filter(v => v);
+    const minLashesPrice = lashesPrices.length ? Math.min(...lashesPrices) : 2500;
+
+    document.getElementById('servicesGrid').innerHTML = `
+        <div class="service-card">
+            <div class="service-img" style="background-image: url('${c.service_lashes_img || 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=400'}')"></div>
+            <div class="service-content">
+                <h3>Наращивание ресниц</h3>
+                <div class="price">от ${minLashesPrice} ₽</div>
+                <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
             </div>
-            <div class="service-card">
-                <div class="service-img" style="background-image: url('${c.service_brows_img || 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400'}')"></div>
-                <div class="service-content">
-                    <h3>Ламинирование бровей</h3>
-                    <div class="price">от ${p.brows} ₽</div>
-                    <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
-                </div>
+        </div>
+        <div class="service-card">
+            <div class="service-img" style="background-image: url('${c.service_brows_img || 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400'}')"></div>
+            <div class="service-content">
+                <h3>Ламинирование бровей</h3>
+                <div class="price">от ${p.brows} ₽</div>
+                <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
             </div>
-            <div class="service-card">
-                <div class="service-img" style="background-image: url('${c.service_complex_img || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400'}')"></div>
-                <div class="service-content">
-                    <h3>Комплекс: Ресницы + Брови</h3>
-                    <div class="price">${p.complex} ₽</div>
-                    <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
-                </div>
+        </div>
+        <div class="service-card">
+            <div class="service-img" style="background-image: url('${c.service_complex_img || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400'}')"></div>
+            <div class="service-content">
+                <h3>Комплекс: Ресницы + Брови</h3>
+                <div class="price">${p.complex} ₽</div>
+                <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
             </div>
-        `;
-    }
+        </div>
+    `;
+}
 
     // Загрузка одобренных отзывов
     async function loadReviews() {
