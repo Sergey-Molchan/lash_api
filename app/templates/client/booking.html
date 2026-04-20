@@ -68,6 +68,11 @@
         group.style.display = this.value === 'lashes' ? 'block' : 'none';
     });
 
+    // Принудительно показываем блок, если уже выбраны ресницы
+    if (document.getElementById('serviceType').value === 'lashes') {
+        document.getElementById('lashesVolumeGroup').style.display = 'block';
+    }
+
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     document.getElementById('bookingDate').min = tomorrow.toISOString().split('T')[0];
