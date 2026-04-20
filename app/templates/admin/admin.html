@@ -93,6 +93,7 @@
 <div id="tab-prices" class="tab-content">
     <h3>💰 Управление ценами</h3>
     <div class="price-row"><span style="width:180px;">Наращивание 1D:</span><input type="number" id="priceLashes_1d"> ₽<button class="btn-primary" onclick="savePrice('lashes_1d')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Наращивание 1.5D:</span><input type="number" id="priceLashes_1.5d"> ₽<button class="btn-primary" onclick="savePrice('lashes_1.5d')">Сохранить</button></div>
     <div class="price-row"><span style="width:180px;">Наращивание 2D:</span><input type="number" id="priceLashes_2d"> ₽<button class="btn-primary" onclick="savePrice('lashes_2d')">Сохранить</button></div>
     <div class="price-row"><span style="width:180px;">Наращивание 3D:</span><input type="number" id="priceLashes_3d"> ₽<button class="btn-primary" onclick="savePrice('lashes_3d')">Сохранить</button></div>
     <div class="price-row"><span style="width:180px;">Ламинирование бровей:</span><input type="number" id="priceBrows"> ₽<button class="btn-primary" onclick="savePrice('brows')">Сохранить</button></div>
@@ -294,6 +295,7 @@ async function loadPrices() {
     const res = await fetch('/api/prices');
     const p = await res.json();
     document.getElementById('priceLashes_1d').value = p.lashes_1d || 2500;
+    document.getElementById('priceLashes_1.5d').value = p.lashes_1_5d || 2750;
     document.getElementById('priceLashes_2d').value = p.lashes_2d || 3000;
     document.getElementById('priceLashes_3d').value = p.lashes_3d || 3500;
     document.getElementById('priceBrows').value = p.brows || 2000;

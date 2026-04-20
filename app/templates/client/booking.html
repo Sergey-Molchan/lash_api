@@ -13,7 +13,8 @@
     <div id="message" class="message"></div>
     <form id="bookingForm">
         <div class="form-group"><label>👤 Ваше имя</label><input type="text" id="clientName" required></div>
-        <div class="form-group"><label>📞 Телефон</label><input type="tel" id="clientPhone" placeholder="+7 (928) 960-19-62" required></div>
+        <div class="form-group"><label>📞 Телефон</label><input type="tel" id="clientPhone"
+                                                               placeholder="+7 (928) 960-19-62" required></div>
         <div class="form-group"><label>💇 Услуга</label><select id="serviceType">
             <option value="lashes">Наращивание ресниц (2.5 часа)</option>
             <option value="brows">Ламинирование бровей (1 час)</option>
@@ -25,10 +26,11 @@
             <label>💎 Объём ресниц</label>
             <select id="lashesVolume">
                 <option value="1d">1D (классика) — натуральный эффект</option>
+                <option value="1.5d">1.5D (полуторный) — естественный объём</option>
                 <option value="2d">2D (полуобъём) — выразительный взгляд</option>
                 <option value="3d">3D (объём) — эффектный макияж</option>
             </select>
-            <div class="info-text">💰 Цена зависит от выбранного объёма</div>
+            <div class="info-text">💰 Цена зависит от выбранного объёма - чужое снятие 200р</div>
         </div>
         <div class="form-group"><label>📅 Дата</label><input type="date" id="bookingDate" class="calendar-input"></div>
         <div class="form-group"><label>⏰ Время</label>
@@ -36,7 +38,8 @@
                 <div class="time-slot disabled">Сначала выберите дату</div>
             </div>
         </div>
-        <div class="form-group"><label>💬 Комментарий к записи (необязательно)</label><textarea id="comment" rows="3" placeholder="Например: аллергия, пожелания к мастеру..."></textarea>
+        <div class="form-group"><label>💬 Комментарий к записи (необязательно)</label><textarea id="comment" rows="3"
+                                                                                               placeholder="Например: аллергия, пожелания к мастеру..."></textarea>
         </div>
         <button type="submit">Записаться</button>
     </form>
