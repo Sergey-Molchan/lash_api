@@ -68,3 +68,8 @@ async def shutdown():
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
+
+
+@app.get("/add-to-home", response_class=HTMLResponse)
+async def add_to_home_page():
+    return read_html("app/templates/add-to-home.html")
