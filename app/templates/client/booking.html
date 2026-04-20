@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8"><meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>Запись в Lash Studio</title>
     <style>
@@ -25,12 +25,12 @@
         <div class="form-group" id="lashesVolumeGroup" style="display:none;">
             <label>💎 Объём ресниц</label>
             <select id="lashesVolume">
-                <option value="1d">1D (классика) — 2500 ₽</option>
-                <option value="1.5d">1.5D (полуторный) — 2750 ₽</option>
-                <option value="2d">2D (полуобъём) — 3000 ₽</option>
-                <option value="3d">3D (объём) — 3500 ₽</option>
+                <option value="1d">1D (классика)</option>
+                <option value="1.5d">1.5D (полуторный)</option>
+                <option value="2d">2D (полуобъём)</option>
+                <option value="3d">3D (объём)</option>
             </select>
-            <div class="info-text">💰 Цена зависит от выбранного объёма</div>
+            <div class="info-text" id="priceInfo">💰 Цена загружается...</div>
         </div>
         <div class="form-group"><label>📅 Дата</label><input type="date" id="bookingDate" class="calendar-input"></div>
         <div class="form-group"><label>⏰ Время</label>
@@ -44,88 +44,142 @@
     </form>
 </div>
 <script>
-    let selectedTime=null;
-    const tomorrow=new Date();
-    tomorrow.setDate(tomorrow.getDate()+1);
-    document.getElementById('bookingDate').min=tomorrow.toISOString().split('T')[0];
+    let selectedTime = null;
+    let prices = {};
+
+    // Загрузка цен из API
+    async function loadPrices() {
+        try {
+            const response = await fetch('/api/prices');
+            if (!response.ok) throw new Error('Ошибка загрузки цен');
+            prices = await response.json();
+
+            // Обновляем отображение цен в выпадающем списке
+            const volumeSelect = document.getElementById('lashesVolume');
+            if (volumeSelect) {
+                for (let option of volumeSelect.options) {
+                    const price = prices[`lashes_${option.value}`];
+                    if (price) {
+                        option.text = `${option.value.toUpperCase()} — ${price} ₽`;
+                    }
+                }
+            }
+
+            // Обновляем информационное поле
+            const priceInfo = document.getElementById('priceInfo');
+            if (priceInfo && prices.lashes_1d) {
+                priceInfo.innerHTML = `💰 Цены: 1D: ${prices.lashes_1d}₽, 1.5D: ${prices.lashes_1_5d}₽, 2D: ${prices.lashes_2d}₽, 3D: ${prices.lashes_3d}₽`;
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки цен:', error);
+            const priceInfo = document.getElementById('priceInfo');
+            if (priceInfo) priceInfo.innerHTML = '💰 Цены временно недоступны';
+        }
+    }
+
+    // Загрузка цен при загрузке страницы
+    loadPrices();
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById('bookingDate').min = tomorrow.toISOString().split('T')[0];
 
     document.getElementById('serviceType').addEventListener('change', function() {
         const group = document.getElementById('lashesVolumeGroup');
         group.style.display = this.value === 'lashes' ? 'block' : 'none';
     });
 
-    document.getElementById('bookingDate').addEventListener('change',async function(){
-        const date=this.value;
-        if(!date)return;
-        const response=await fetch(`/api/client/available-slots?date=${date}`);
-        const data=await response.json();
-        const timeSlotsDiv=document.getElementById('timeSlots');
-        if(data.is_day_off){
-            timeSlotsDiv.innerHTML='<div class="time-slot disabled">❌ В этот день студия не работает</div>';
-            selectedTime=null;
-            return;
+    document.getElementById('bookingDate').addEventListener('change', async function() {
+        const date = this.value;
+        if (!date) return;
+        try {
+            const response = await fetch(`/api/client/available-slots?date=${date}`);
+            const data = await response.json();
+            const timeSlotsDiv = document.getElementById('timeSlots');
+            if (data.is_day_off) {
+                timeSlotsDiv.innerHTML = '<div class="time-slot disabled">❌ В этот день студия не работает</div>';
+                selectedTime = null;
+                return;
+            }
+            if (!data.slots || data.slots.length === 0) {
+                timeSlotsDiv.innerHTML = '<div class="time-slot disabled">😞 Нет свободного времени</div>';
+                selectedTime = null;
+                return;
+            }
+            let html = '';
+            for (const slot of data.slots) {
+                html += `<div class="time-slot" data-time="${slot}" onclick="selectTime('${slot}')">${slot}</div>`;
+            }
+            timeSlotsDiv.innerHTML = html;
+            selectedTime = null;
+        } catch (error) {
+            console.error('Ошибка загрузки слотов:', error);
+            document.getElementById('timeSlots').innerHTML = '<div class="time-slot disabled">❌ Ошибка загрузки</div>';
         }
-        if(!data.slots||data.slots.length===0){
-            timeSlotsDiv.innerHTML='<div class="time-slot disabled">😞 Нет свободного времени</div>';
-            selectedTime=null;
-            return;
-        }
-        let html='';
-        for(const slot of data.slots){
-            html+=`<div class="time-slot" data-time="${slot}" onclick="selectTime('${slot}')">${slot}</div>`;
-        }
-        timeSlotsDiv.innerHTML=html;
-        selectedTime=null;
     });
 
-    function selectTime(time){
-        document.querySelectorAll('.time-slot').forEach(el=>el.classList.remove('selected'));
+    function selectTime(time) {
+        document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('selected'));
         event.target.classList.add('selected');
-        selectedTime=time;
+        selectedTime = time;
     }
 
-    document.getElementById('bookingForm').addEventListener('submit',async(e)=>{
+    document.getElementById('bookingForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const name=document.getElementById('clientName').value.trim();
-        const phone=document.getElementById('clientPhone').value.trim();
-        const service=document.getElementById('serviceType').value;
+        const name = document.getElementById('clientName').value.trim();
+        const phone = document.getElementById('clientPhone').value.trim();
+        const service = document.getElementById('serviceType').value;
         const lashesVolume = service === 'lashes' ? document.getElementById('lashesVolume').value : null;
-        const date=document.getElementById('bookingDate').value;
-        const comment=document.getElementById('comment').value;
-        if(!name||!phone){showMessage('Заполните имя и телефон','error');return;}
-        if(!date){showMessage('Выберите дату','error');return;}
-        if(!selectedTime){showMessage('Выберите время','error');return;}
-        const bookingDateTime=`${date}T${selectedTime}:00`;
-        const response=await fetch('/api/client/book',{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({
-                client_name:name,
-                client_phone:phone,
-                service_type:service,
-                lashes_volume:lashesVolume,
-                booking_date:bookingDateTime,
-                comment:comment
-            })
-        });
-        const result=await response.json();
-        if(response.ok){
-            showMessage(`✅ Запись создана! Номер: ${result.id}`,'success');
-            document.getElementById('bookingForm').reset();
-            document.getElementById('timeSlots').innerHTML='<div class="time-slot disabled">Сначала выберите дату</div>';
-            document.getElementById('lashesVolumeGroup').style.display='none';
-            selectedTime=null;
-        }else{
-            showMessage(`❌ Ошибка: ${result.detail}`,'error');
+        const date = document.getElementById('bookingDate').value;
+        const comment = document.getElementById('comment').value;
+
+        if (!name || !phone) { showMessage('Заполните имя и телефон', 'error'); return; }
+        if (!date) { showMessage('Выберите дату', 'error'); return; }
+        if (!selectedTime) { showMessage('Выберите время', 'error'); return; }
+
+        const bookingDateTime = `${date}T${selectedTime}:00`;
+
+        try {
+            const response = await fetch('/api/client/book', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    client_name: name,
+                    client_phone: phone,
+                    service_type: service,
+                    lashes_volume: lashesVolume,
+                    booking_date: bookingDateTime,
+                    comment: comment
+                })
+            });
+            const result = await response.json();
+            if (response.ok) {
+                let priceInfo = '';
+                if (service === 'lashes' && lashesVolume) {
+                    const price = prices[`lashes_${lashesVolume}`];
+                    if (price) priceInfo = ` Сумма к оплате: ${price}₽`;
+                }
+                showMessage(`✅ Запись создана! Номер: ${result.id}.${priceInfo}`, 'success');
+                document.getElementById('bookingForm').reset();
+                document.getElementById('timeSlots').innerHTML = '<div class="time-slot disabled">Сначала выберите дату</div>';
+                document.getElementById('lashesVolumeGroup').style.display = 'none';
+                selectedTime = null;
+            } else {
+                showMessage(`❌ Ошибка: ${result.detail}`, 'error');
+            }
+        } catch (error) {
+            showMessage('❌ Ошибка соединения. Попробуйте позже.', 'error');
         }
     });
 
-    function showMessage(text,type){
-        const msg=document.getElementById('message');
-        msg.textContent=text;
-        msg.className=`message ${type}`;
-        setTimeout(()=>{msg.className='message';msg.style.display='none';},5000);
-        msg.style.display='block';
+    function showMessage(text, type) {
+        const msg = document.getElementById('message');
+        msg.textContent = text;
+        msg.className = `message ${type}`;
+        msg.style.display = 'block';
+        setTimeout(() => {
+            msg.style.display = 'none';
+        }, 5000);
     }
 </script>
 </body>
