@@ -93,7 +93,7 @@
 <div id="tab-prices" class="tab-content">
     <h3>💰 Управление ценами</h3>
     <div class="price-row"><span style="width:180px;">Наращивание 1D:</span><input type="number" id="priceLashes_1d"> ₽<button class="btn-primary" onclick="savePrice('lashes_1d')">Сохранить</button></div>
-    <div class="price-row"><span style="width:180px;">Наращивание 1.5D:</span><input type="number" id="priceLashes_1.5d"> ₽<button class="btn-primary" onclick="savePrice('lashes_1.5d')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Наращивание 1.5D:</span><input type="number" id="priceLashes_1.5d"> ₽<button class="btn-primary" onclick="savePrice('lashes_1_5d')">Сохранить</button></div>
     <div class="price-row"><span style="width:180px;">Наращивание 2D:</span><input type="number" id="priceLashes_2d"> ₽<button class="btn-primary" onclick="savePrice('lashes_2d')">Сохранить</button></div>
     <div class="price-row"><span style="width:180px;">Наращивание 3D:</span><input type="number" id="priceLashes_3d"> ₽<button class="btn-primary" onclick="savePrice('lashes_3d')">Сохранить</button></div>
     <div class="price-row"><span style="width:180px;">Ламинирование бровей:</span><input type="number" id="priceBrows"> ₽<button class="btn-primary" onclick="savePrice('brows')">Сохранить</button></div>
@@ -305,11 +305,9 @@ async function loadPrices() {
 
 async function savePrice(service) {
     let priceInput = null;
-
-    // Маппинг сервисов на ID полей
     const serviceMap = {
         'lashes_1d': 'priceLashes_1d',
-        'lashes_1.5d': 'priceLashes_1.5d',
+        'lashes_1_5d': 'priceLashes_1.5d',
         'lashes_2d': 'priceLashes_2d',
         'lashes_3d': 'priceLashes_3d',
         'brows': 'priceBrows',
@@ -330,8 +328,6 @@ async function savePrice(service) {
         return;
     }
 
-    console.log('Сохраняем:', service, '=', price);
-
     try {
         const response = await fetch('/api/prices/', {
             method: 'POST',
@@ -341,7 +337,7 @@ async function savePrice(service) {
 
         if (response.ok) {
             alert('✅ Цена сохранена');
-            loadPrices(); // перезагружаем цены в форме
+            loadPrices();
         } else {
             const error = await response.json();
             alert('❌ Ошибка: ' + (error.detail || 'Неизвестная ошибка'));
@@ -492,7 +488,11 @@ async function loadMonthlyStats() {
     }
     let html = '<h4>📈 Помесячная статистика</h4><table class="bookings-table"><thead><tr><th>Месяц</th><th>Количество записей</th><th>Выручка</th></tr></thead><tbody>';
     for (let i = 0; i < data.months.length; i++) {
-        html += `<tr><td>${data.months[i]}</td><td>${data.counts[i]} шт</td><td>${data.revenues[i].toLocaleString()} ₽</td></tr>`;
+        html += `<tr>
+            <td>${data.months[i]}</td>
+            <td>${data.counts[i]} шт</td>
+            <td>${data.revenues[i].toLocaleString()} ₽</td>
+        </tr>`;
     }
     html += '</tbody></table>';
     document.getElementById('monthlyChart').innerHTML = html;
