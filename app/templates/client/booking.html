@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>Запись в Lash Studio</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}body{font-family:Segoe UI,Arial,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:40px 20px}.container{max-width:550px;margin:0 auto;background:white;border-radius:25px;padding:35px;box-shadow:0 20px 60px rgba(0,0,0,0.3)}h1{text-align:center;margin-bottom:10px;color:#333}.back-link{display:inline-block;margin-bottom:20px;color:#667eea;text-decoration:none}.price{text-align:center;font-size:28px;font-weight:bold;color:#4caf50;margin:15px 0}.form-group{margin-bottom:20px}label{display:block;margin-bottom:8px;font-weight:600;color:#555}input,select,textarea{width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:10px;font-size:16px;font-family:inherit}textarea{resize:vertical}button{width:100%;padding:14px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:10px;font-size:18px;font-weight:bold;cursor:pointer}.message{margin-top:20px;padding:12px;border-radius:10px;display:none}.message.success{background:#d4edda;color:#155724;display:block}.message.error{background:#f8d7da;color:#721c24;display:block}.time-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}.time-slot{background:#f0f2ff;padding:12px;text-align:center;border-radius:10px;cursor:pointer;border:2px solid transparent}.time-slot.selected{background:#4caf50;color:white}.time-slot.disabled{background:#e0e0e0;color:#999;cursor:not-allowed;text-decoration:line-through}.info-text{font-size:12px;color:#666;margin-top:5px}
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:Segoe UI,Arial,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:40px 20px}.container{max-width:550px;margin:0 auto;background:white;border-radius:25px;padding:35px;box-shadow:0 20px 60px rgba(0,0,0,0.3)}h1{text-align:center;margin-bottom:10px;color:#333}.back-link{display:inline-block;margin-bottom:20px;color:#667eea;text-decoration:none}.form-group{margin-bottom:20px}label{display:block;margin-bottom:8px;font-weight:600;color:#555}input,select,textarea{width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:10px;font-size:16px;font-family:inherit}textarea{resize:vertical}button{width:100%;padding:14px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:10px;font-size:18px;font-weight:bold;cursor:pointer}.message{margin-top:20px;padding:12px;border-radius:10px;display:none}.message.success{background:#d4edda;color:#155724;display:block}.message.error{background:#f8d7da;color:#721c24;display:block}.time-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}.time-slot{background:#f0f2ff;padding:12px;text-align:center;border-radius:10px;cursor:pointer;border:2px solid transparent}.time-slot.selected{background:#4caf50;color:white}.time-slot.disabled{background:#e0e0e0;color:#999;cursor:not-allowed;text-decoration:line-through}.info-text{font-size:12px;color:#666;margin-top:5px}
     </style>
 </head>
 <body>
@@ -15,13 +15,13 @@
     <form id="bookingForm">
         <div class="form-group"><label>👤 Ваше имя</label><input type="text" id="clientName" required></div>
         <div class="form-group"><label>📞 Телефон</label><input type="tel" id="clientPhone" placeholder="+7 (928) 960-19-62" required></div>
+
         <div class="form-group"><label>💇 Услуга</label><select id="serviceType">
             <option value="lashes">Наращивание ресниц (2.5 часа)</option>
             <option value="brows">Ламинирование бровей (1 час)</option>
             <option value="complex">Комплекс (ресницы+брови) (3 часа)</option>
-        </select>
-            <div class="info-text">⏱️ Время бронируется с учётом длительности процедуры</div>
-        </div>
+        </select></div>
+
         <div class="form-group" id="lashesVolumeGroup" style="display:none;">
             <label>💎 Объём ресниц</label>
             <select id="lashesVolume">
@@ -30,16 +30,16 @@
                 <option value="2d">2D (полуобъём)</option>
                 <option value="3d">3D (объём)</option>
             </select>
-            <div class="info-text" id="priceInfo">💰 Цена загружается...</div>
+            <div class="info-text" id="priceInfo">💰 Загрузка цен...</div>
         </div>
+
         <div class="form-group"><label>📅 Дата</label><input type="date" id="bookingDate" class="calendar-input"></div>
         <div class="form-group"><label>⏰ Время</label>
             <div id="timeSlots" class="time-slots">
                 <div class="time-slot disabled">Сначала выберите дату</div>
             </div>
         </div>
-        <div class="form-group"><label>💬 Комментарий к записи (необязательно)</label><textarea id="comment" rows="3" placeholder="Например: аллергия, пожелания к мастеру..."></textarea>
-        </div>
+        <div class="form-group"><label>💬 Комментарий</label><textarea id="comment" rows="3" placeholder="Пожелания к мастеру..."></textarea></div>
         <button type="submit">Записаться</button>
     </form>
 </div>
@@ -47,83 +47,71 @@
     let selectedTime = null;
     let prices = {};
 
-    // Загрузка цен из API
+    // Загрузка цен из админки
     async function loadPrices() {
         try {
-            const response = await fetch('/api/prices');
-            if (!response.ok) throw new Error('Ошибка загрузки цен');
-            prices = await response.json();
-
-            // Обновляем отображение цен в выпадающем списке
-            const volumeSelect = document.getElementById('lashesVolume');
-            if (volumeSelect) {
-                for (let option of volumeSelect.options) {
-                    const price = prices[`lashes_${option.value}`];
-                    if (price) {
-                        option.text = `${option.value.toUpperCase()} — ${price} ₽`;
+            const res = await fetch('/api/prices');
+            if (res.ok) {
+                prices = await res.json();
+                const select = document.getElementById('lashesVolume');
+                const info = document.getElementById('priceInfo');
+                if (select && prices) {
+                    for (let opt of select.options) {
+                        let price = prices[`lashes_${opt.value}`];
+                        if (price) opt.text = `${opt.value.toUpperCase()} — ${price} ₽`;
                     }
+                    if (info) info.innerHTML = `💰 Цены: 1D: ${prices.lashes_1d}₽, 1.5D: ${prices.lashes_1_5d}₽, 2D: ${prices.lashes_2d}₽, 3D: ${prices.lashes_3d}₽`;
                 }
             }
-
-            // Обновляем информационное поле
-            const priceInfo = document.getElementById('priceInfo');
-            if (priceInfo && prices.lashes_1d) {
-                priceInfo.innerHTML = `💰 Цены: 1D: ${prices.lashes_1d}₽, 1.5D: ${prices.lashes_1_5d}₽, 2D: ${prices.lashes_2d}₽, 3D: ${prices.lashes_3d}₽`;
-            }
-        } catch (error) {
-            console.error('Ошибка загрузки цен:', error);
-            const priceInfo = document.getElementById('priceInfo');
-            if (priceInfo) priceInfo.innerHTML = '💰 Цены временно недоступны';
-        }
+        } catch(e) { console.error('Ошибка загрузки цен:', e); }
     }
-
-    // Загрузка цен при загрузке страницы
     loadPrices();
 
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    document.getElementById('bookingDate').min = tomorrow.toISOString().split('T')[0];
-
+    // Показать/скрыть выбор объёма
     document.getElementById('serviceType').addEventListener('change', function() {
         const group = document.getElementById('lashesVolumeGroup');
         group.style.display = this.value === 'lashes' ? 'block' : 'none';
     });
 
+    // Доступные даты
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById('bookingDate').min = tomorrow.toISOString().split('T')[0];
+
+    // Загрузка слотов времени
     document.getElementById('bookingDate').addEventListener('change', async function() {
         const date = this.value;
         if (!date) return;
         try {
-            const response = await fetch(`/api/client/available-slots?date=${date}`);
-            const data = await response.json();
-            const timeSlotsDiv = document.getElementById('timeSlots');
+            const res = await fetch(`/api/client/available-slots?date=${date}`);
+            const data = await res.json();
+            const slotsDiv = document.getElementById('timeSlots');
             if (data.is_day_off) {
-                timeSlotsDiv.innerHTML = '<div class="time-slot disabled">❌ В этот день студия не работает</div>';
+                slotsDiv.innerHTML = '<div class="time-slot disabled">❌ Выходной</div>';
                 selectedTime = null;
                 return;
             }
             if (!data.slots || data.slots.length === 0) {
-                timeSlotsDiv.innerHTML = '<div class="time-slot disabled">😞 Нет свободного времени</div>';
+                slotsDiv.innerHTML = '<div class="time-slot disabled">😞 Нет свободного времени</div>';
                 selectedTime = null;
                 return;
             }
             let html = '';
-            for (const slot of data.slots) {
-                html += `<div class="time-slot" data-time="${slot}" onclick="selectTime('${slot}')">${slot}</div>`;
+            for (let slot of data.slots) {
+                html += `<div class="time-slot" onclick="selectTime('${slot}')">${slot}</div>`;
             }
-            timeSlotsDiv.innerHTML = html;
+            slotsDiv.innerHTML = html;
             selectedTime = null;
-        } catch (error) {
-            console.error('Ошибка загрузки слотов:', error);
-            document.getElementById('timeSlots').innerHTML = '<div class="time-slot disabled">❌ Ошибка загрузки</div>';
-        }
+        } catch(e) { console.error(e); }
     });
 
-    function selectTime(time) {
+    window.selectTime = function(time) {
         document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('selected'));
         event.target.classList.add('selected');
         selectedTime = time;
-    }
+    };
 
+    // Отправка формы
     document.getElementById('bookingForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('clientName').value.trim();
@@ -140,7 +128,7 @@
         const bookingDateTime = `${date}T${selectedTime}:00`;
 
         try {
-            const response = await fetch('/api/client/book', {
+            const res = await fetch('/api/client/book', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -152,14 +140,14 @@
                     comment: comment
                 })
             });
-            const result = await response.json();
-            if (response.ok) {
-                let priceInfo = '';
+            const result = await res.json();
+            if (res.ok) {
+                let msg = `✅ Запись создана! Номер: ${result.id}`;
                 if (service === 'lashes' && lashesVolume) {
-                    const price = prices[`lashes_${lashesVolume}`];
-                    if (price) priceInfo = ` Сумма к оплате: ${price}₽`;
+                    let price = prices[`lashes_${lashesVolume}`];
+                    if (price) msg += ` Сумма: ${price} ₽`;
                 }
-                showMessage(`✅ Запись создана! Номер: ${result.id}.${priceInfo}`, 'success');
+                showMessage(msg, 'success');
                 document.getElementById('bookingForm').reset();
                 document.getElementById('timeSlots').innerHTML = '<div class="time-slot disabled">Сначала выберите дату</div>';
                 document.getElementById('lashesVolumeGroup').style.display = 'none';
@@ -167,8 +155,8 @@
             } else {
                 showMessage(`❌ Ошибка: ${result.detail}`, 'error');
             }
-        } catch (error) {
-            showMessage('❌ Ошибка соединения. Попробуйте позже.', 'error');
+        } catch(e) {
+            showMessage('❌ Ошибка соединения', 'error');
         }
     });
 
@@ -177,9 +165,7 @@
         msg.textContent = text;
         msg.className = `message ${type}`;
         msg.style.display = 'block';
-        setTimeout(() => {
-            msg.style.display = 'none';
-        }, 5000);
+        setTimeout(() => msg.style.display = 'none', 5000);
     }
 </script>
 </body>
