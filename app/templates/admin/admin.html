@@ -333,7 +333,7 @@ async function savePrice(service) {
     console.log('Сохраняем:', service, '=', price);
 
     try {
-        const response = await fetch('/api/prices', {
+        const response = await fetch('/api/prices/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ service: service, price: price })
