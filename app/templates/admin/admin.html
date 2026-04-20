@@ -306,20 +306,32 @@ async function loadPrices() {
 async function savePrice(service) {
     let priceInput = null;
     if (service === 'lashes_1d') priceInput = document.getElementById('priceLashes_1d');
+    else if (service === 'lashes_1.5d') priceInput = document.getElementById('priceLashes_1.5d');
     else if (service === 'lashes_2d') priceInput = document.getElementById('priceLashes_2d');
     else if (service === 'lashes_3d') priceInput = document.getElementById('priceLashes_3d');
     else if (service === 'brows') priceInput = document.getElementById('priceBrows');
     else if (service === 'complex') priceInput = document.getElementById('priceComplex');
     else if (service === 'deposit') priceInput = document.getElementById('priceDeposit');
 
-    if (!priceInput) return;
+    if (!priceInput) {
+        alert('Ошибка: поле не найдено');
+        return;
+    }
     const price = parseInt(priceInput.value);
-    await fetch('/api/prices', {
+    if (isNaN(price)) {
+        alert('Введите корректную цену');
+        return;
+    }
+    const response = await fetch('/api/prices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ service, price: price })
     });
-    alert('Сохранено');
+    if (response.ok) {
+        alert('✅ Цена сохранена');
+    } else {
+        alert('❌ Ошибка сохранения');
+    }
 }
 
 async function loadContent() {
