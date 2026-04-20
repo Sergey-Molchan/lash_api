@@ -15,13 +15,11 @@
     <form id="bookingForm">
         <div class="form-group"><label>👤 Ваше имя</label><input type="text" id="clientName" required></div>
         <div class="form-group"><label>📞 Телефон</label><input type="tel" id="clientPhone" placeholder="+7 (928) 960-19-62" required></div>
-
         <div class="form-group"><label>💇 Услуга</label><select id="serviceType">
             <option value="lashes">Наращивание ресниц (2.5 часа)</option>
             <option value="brows">Ламинирование бровей (1 час)</option>
             <option value="complex">Комплекс (ресницы+брови) (3 часа)</option>
         </select></div>
-
         <div class="form-group" id="lashesVolumeGroup" style="display:none;">
             <label>💎 Объём ресниц</label>
             <select id="lashesVolume">
@@ -32,7 +30,6 @@
             </select>
             <div class="info-text" id="priceInfo">💰 Загрузка цен...</div>
         </div>
-
         <div class="form-group"><label>📅 Дата</label><input type="date" id="bookingDate" class="calendar-input"></div>
         <div class="form-group"><label>⏰ Время</label>
             <div id="timeSlots" class="time-slots">
@@ -47,7 +44,6 @@
     let selectedTime = null;
     let prices = {};
 
-    // Загрузка цен из админки
     async function loadPrices() {
         try {
             const res = await fetch('/api/prices');
@@ -67,18 +63,15 @@
     }
     loadPrices();
 
-    // Показать/скрыть выбор объёма
     document.getElementById('serviceType').addEventListener('change', function() {
         const group = document.getElementById('lashesVolumeGroup');
         group.style.display = this.value === 'lashes' ? 'block' : 'none';
     });
 
-    // Доступные даты
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     document.getElementById('bookingDate').min = tomorrow.toISOString().split('T')[0];
 
-    // Загрузка слотов времени
     document.getElementById('bookingDate').addEventListener('change', async function() {
         const date = this.value;
         if (!date) return;
@@ -111,7 +104,6 @@
         selectedTime = time;
     };
 
-    // Отправка формы
     document.getElementById('bookingForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('clientName').value.trim();
@@ -120,13 +112,10 @@
         const lashesVolume = service === 'lashes' ? document.getElementById('lashesVolume').value : null;
         const date = document.getElementById('bookingDate').value;
         const comment = document.getElementById('comment').value;
-
         if (!name || !phone) { showMessage('Заполните имя и телефон', 'error'); return; }
         if (!date) { showMessage('Выберите дату', 'error'); return; }
         if (!selectedTime) { showMessage('Выберите время', 'error'); return; }
-
         const bookingDateTime = `${date}T${selectedTime}:00`;
-
         try {
             const res = await fetch('/api/client/book', {
                 method: 'POST',
