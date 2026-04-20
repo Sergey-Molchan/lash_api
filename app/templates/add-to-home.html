@@ -43,10 +43,7 @@
         }
 
         .step {
-            margin-bottom: 35px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin-bottom: 40px;
             text-align: center;
         }
 
@@ -61,7 +58,7 @@
             justify-content: center;
             font-weight: bold;
             font-size: 18px;
-            margin-bottom: 15px;
+            margin: 0 auto 15px auto;
         }
 
         .step-title {
@@ -82,44 +79,20 @@
             background: #f5f7fb;
             border-radius: 24px;
             padding: 15px;
-            margin: 10px 0;
+            margin: 10px auto;
             border: 1px solid #e9ecef;
             max-width: 280px;
             width: 100%;
+            display: flex;
+            justify-content: center;
         }
 
         .screenshot img {
             width: 100%;
+            max-width: 250px;
             height: auto;
             border-radius: 16px;
             display: block;
-        }
-
-        .mock-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 10px auto;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .mock-icon span {
-            font-size: 40px;
-        }
-
-        .mock-menu {
-            background: #1a1a2e;
-            border-radius: 16px;
-            padding: 12px;
-            color: white;
-            font-size: 14px;
-            text-align: center;
-            margin: 10px auto;
-            max-width: 200px;
         }
 
         .btn-home {
@@ -133,6 +106,8 @@
             margin-top: 20px;
             transition: transform 0.2s;
             text-align: center;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .btn-home:hover {
@@ -171,10 +146,7 @@
                 Нажмите на иконку <strong>«Поделиться»</strong> внизу экрана
             </div>
             <div class="screenshot">
-                <div class="mock-icon">📤</div>
-                <div style="text-align: center; font-size: 13px; color: #666; margin-top: 8px;">
-                    Иконка «Поделиться» (квадрат со стрелкой вверх)
-                </div>
+                <img src="/static/images/1.jpg" alt="Шаг 1: иконка поделиться" onerror="this.src='https://placehold.co/250x400?text=Шаг+1'">
             </div>
         </div>
 
@@ -186,12 +158,7 @@
                 В появившемся меню найдите и нажмите <strong>«На экран «Домой»</strong>
             </div>
             <div class="screenshot">
-                <div class="mock-menu">
-                    • Добавить в закладки<br>
-                    • Добавить в список для чтения<br>
-                    • <strong>⭐ На экран «Домой»</strong><br>
-                    • Найти на сайте
-                </div>
+                <img src="/static/images/2.jpg" alt="Шаг 2: меню поделиться" onerror="this.src='https://placehold.co/250x400?text=Шаг+2'">
             </div>
         </div>
 
@@ -203,16 +170,7 @@
                 Нажмите <strong>«Добавить»</strong> в правом верхнем углу
             </div>
             <div class="screenshot">
-                <div style="background: #1a1a2e; border-radius: 16px; padding: 15px; color: white;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 10px;"></div>
-                        <div style="flex: 1;">
-                            <div style="font-weight: bold;">Lash Studio</div>
-                            <div style="font-size: 11px; opacity: 0.7;">lash-saundra.online</div>
-                        </div>
-                        <div style="color: #4caf50; font-weight: bold;">Добавить</div>
-                    </div>
-                </div>
+                <img src="/static/images/3.jpg" alt="Шаг 3: добавление на экран" onerror="this.src='https://placehold.co/250x400?text=Шаг+3'">
             </div>
         </div>
 
@@ -223,8 +181,8 @@
             <div class="step-desc">
                 Иконка появится на главном экране — нажмите на неё, чтобы открыть сайт как приложение
             </div>
-            <div class="mock-icon">
-                <span>✨</span>
+            <div class="screenshot">
+                <img src="/static/images/4.jpg" alt="Шаг 4: иконка на экране" onerror="this.src='https://placehold.co/250x400?text=Шаг+4'">
             </div>
         </div>
 
