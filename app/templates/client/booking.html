@@ -53,7 +53,8 @@
                 const info = document.getElementById('priceInfo');
                 if (select && prices) {
                     for (let opt of select.options) {
-                        let price = prices[`lashes_${opt.value}`];
+                        let priceKey = opt.value === '1.5d' ? 'lashes_1_5d' : `lashes_${opt.value}`;
+                        let price = prices[priceKey];
                         if (price) opt.text = `${opt.value.toUpperCase()} — ${price} ₽`;
                     }
                     if (info) info.innerHTML = `💰 Цены: 1D: ${prices.lashes_1d}₽, 1.5D: ${prices.lashes_1_5d}₽, 2D: ${prices.lashes_2d}₽, 3D: ${prices.lashes_3d}₽`;
@@ -128,7 +129,8 @@
             if (res.ok) {
                 let msg = `✅ Запись создана! Номер: ${result.id}`;
                 if (service === 'lashes' && lashesVolume) {
-                    let price = prices[`lashes_${lashesVolume}`];
+                    let priceKey = lashesVolume === '1.5d' ? 'lashes_1_5d' : `lashes_${lashesVolume}`;
+                    let price = prices[priceKey];
                     if (price) msg += ` Сумма: ${price} ₽`;
                 }
                 showMessage(msg, 'success');
