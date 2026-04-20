@@ -2,14 +2,15 @@ import os
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 
-# Берём готовый DATABASE_URL от Railway
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
-    # Для локальной разработки — SQLite
     DATABASE_URL = "sqlite+aiosqlite:///./lashes.db"
 
-# Простой engine без лишних параметров
+# Убедись, что для PostgreSQL используется asyncpg
+if "postgresql" in DATABASE_URL and "+asyncpg" not in DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+
 engine = create_async_engine(DATABASE_URL, echo=False)
 
 AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
