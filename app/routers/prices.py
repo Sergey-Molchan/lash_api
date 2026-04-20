@@ -16,7 +16,9 @@ async def get_prices(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Price))
     prices = {p.service: p.price for p in result.scalars().all()}
     return {
-        "lashes": prices.get("lashes", 2500),
+        "lashes_1d": prices.get("lashes_1d", 2500),
+        "lashes_2d": prices.get("lashes_2d", 3000),
+        "lashes_3d": prices.get("lashes_3d", 3500),
         "brows": prices.get("brows", 2000),
         "complex": prices.get("complex", 3800),
         "deposit": prices.get("deposit", 300)
