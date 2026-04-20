@@ -1,3 +1,5 @@
+import os
+
 from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from app.admin_auth import create_session, verify_session, logout
@@ -9,10 +11,11 @@ from app.models import Booking, WorkingHours, Comment
 from typing import List, Optional
 from datetime import date, datetime, timedelta
 
+
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "admin123"
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
 
 LOGIN_HTML = '''<!DOCTYPE html>
 <html lang="ru"><head><meta charset="UTF-8"><title>Вход в админ-панель</title>
