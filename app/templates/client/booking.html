@@ -48,7 +48,6 @@
     tomorrow.setDate(tomorrow.getDate()+1);
     document.getElementById('bookingDate').min=tomorrow.toISOString().split('T')[0];
 
-    // Показать/скрыть выбор объёма ресниц
     document.getElementById('serviceType').addEventListener('change', function() {
         const group = document.getElementById('lashesVolumeGroup');
         group.style.display = this.value === 'lashes' ? 'block' : 'none';

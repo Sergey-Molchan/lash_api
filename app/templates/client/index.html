@@ -1,139 +1,21 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lash Studio - Наращивание ресниц и ламинирование бровей</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Segoe UI',Arial,sans-serif;background:#fff}
-        .header{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);color:white;padding:18px 0;position:fixed;width:100%;top:0;z-index:1000}
-        .container{max-width:1300px;margin:0 auto;padding:0 24px}
-        .header-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
-        .logo{font-size:28px;font-weight:700}.logo span{color:#e94560}
-        .nav{display:flex;gap:30px;align-items:center}
-        .nav a{color:white;text-decoration:none}
-        .btn-book{background:#e94560;padding:10px 25px;border-radius:40px}
-        .hero{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:160px 0 100px;text-align:center}
-        .hero h1{font-size:52px;margin-bottom:20px}
-        .hero-btn{display:inline-block;background:white;color:#764ba2;padding:14px 42px;border-radius:50px;text-decoration:none;font-weight:700}
-        .services{padding:80px 0;background:#f8f9ff}
-        .section-title{text-align:center;font-size:38px;margin-bottom:55px}
-        .services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:35px}
-        .service-card{background:white;border-radius:24px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.08)}
-        .service-img{height:260px;background-size:cover}
-        .service-content{padding:24px}
-        .price{color:#e94560;font-size:28px;font-weight:700}
-        .contact{padding:80px 0}
-        .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px}
-        .map-container{height:350px;border-radius:20px;overflow:hidden}
-        .map-container iframe{width:100%;height:100%;border:none}
-        .reviews{padding:80px 0;background:#f8f9ff}
-        .review-card{background:white;border-radius:20px;padding:20px;margin-bottom:20px;box-shadow:0 5px 15px rgba(0,0,0,0.05)}
-        .review-emoji{font-size:30px}
-        .review-rating{color:#ff9800;margin:10px 0}
-        .review-text{color:#555;margin:10px 0}
-        .review-author{color:#999;font-size:14px}
-        .add-review{background:white;border-radius:20px;padding:30px;margin-top:30px;box-shadow:0 5px 15px rgba(0,0,0,0.05)}
-        .add-review h3{margin-bottom:20px}
-        .add-review input,.add-review select,.add-review textarea{width:100%;padding:12px;margin-bottom:15px;border:1px solid #ddd;border-radius:10px}
-        .add-review button{background:#e94560;color:white;border:none;padding:12px 30px;border-radius:30px;cursor:pointer}
-        .emoji-selector{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
-        .emoji-option{font-size:24px;cursor:pointer;padding:5px;border-radius:10px}
-        .emoji-option:hover{background:#f0f0f0}
-        .rating-stars{display:flex;gap:5px;margin-bottom:15px}
-        .rating-star{font-size:30px;cursor:pointer;color:#ddd}
-        .rating-star.active{color:#ff9800}
-        .footer{background:#1a1a2e;color:white;padding:40px 0;text-align:center}
-        .taxi-btn{display:inline-block;background:#ff9800;color:white;padding:12px 30px;border-radius:50px;text-decoration:none;font-weight:600;margin-top:20px;margin-right:10px}
-        .call-btn{display:inline-block;background:#4caf50;color:white;padding:12px 30px;border-radius:50px;text-decoration:none;font-weight:600;margin-top:20px}
-        @media(max-width:768px){.hero h1{font-size:32px}.contact-grid{grid-template-columns:1fr}.nav{display:none}}
-        .emoji-option.selected { background: #e94560; color: white; }
-    </style>
-</head>
-<body>
-<header class="header">
-    <div class="container header-inner">
-        <div class="logo">Lash <span>Studio</span></div>
-        <div class="nav"><a href="#services">Услуги</a><a href="/portfolio">Портфолио</a><a href="#contact">Контакты</a><a
-                href="/booking" class="btn-book">Записаться</a></div>
-    </div>
-</header>
-<section class="hero">
-    <div class="container"><h1 id="heroTitle">✨ Идеальный взгляд начинается здесь</h1>
-        <p id="heroText">Наращивание ресниц и ламинирование бровей в Адлере</p><a href="/booking" class="hero-btn">Записаться
-            сейчас</a></div>
-</section>
-<section id="services" class="services">
-    <div class="container"><h2 class="section-title">Наши услуги</h2>
-        <div class="services-grid" id="servicesGrid"></div>
-    </div>
-</section>
-<section id="reviews" class="reviews">
-    <div class="container"><h2 class="section-title">Отзывы клиентов</h2>
-        <div id="reviewsList"></div>
-        <div class="add-review"><h3>💬 Оставить отзыв</h3>
-            <div class="rating-stars" id="ratingStars"><span class="rating-star" data-rating="1">☆</span><span
-                    class="rating-star" data-rating="2">☆</span><span class="rating-star" data-rating="3">☆</span><span
-                    class="rating-star" data-rating="4">☆</span><span class="rating-star" data-rating="5">☆</span></div>
-            <input type="text" id="reviewName" placeholder="Ваше имя"><input type="tel" id="reviewPhone"
-                                                                             placeholder="Телефон">
-            <div class="emoji-selector" id="emojiSelector"><span class="emoji-option">😊</span><span
-                    class="emoji-option">😍</span><span class="emoji-option">🥰</span><span
-                    class="emoji-option">😘</span><span class="emoji-option">👍</span><span
-                    class="emoji-option">🔥</span><span class="emoji-option">💖</span><span
-                    class="emoji-option">✨</span><span class="emoji-option">💯</span><span
-                    class="emoji-option">😎</span><span class="emoji-option">🤩</span><span class="emoji-option">💪</span>
-            </div>
-            <textarea id="reviewText" rows="4" placeholder="Ваш отзыв..."></textarea>
-            <button id="submitReviewBtn">Отправить отзыв</button>
-        </div>
-    </div>
-</section>
-<section id="contact" class="contact">
-    <div class="container"><h2 class="section-title">Контакты</h2>
-        <div class="contact-grid">
-            <div><h3>Как нас найти</h3>
-                <p id="address">📍 улица Голубые Дали, 78, жилой район Адлер, Сочи, Краснодарский край, 354382</p>
-                <p id="phone">📞 +7 (928) 960-19-62</p><a
-                        href="https://yandex.ru/maps/239/sochi/house/ulitsa_golubyye_dali_78/Z0AYfwZhSUcCQFppfXh0c3lrYQ==/?ll=39.911025%2C43.452585&z=16.9"
-                        class="taxi-btn" target="_blank" style="background:#2196f3">🗺️ Открыть карту</a><a
-                        href="https://taxi.yandex.ru/ru_ru/" class="taxi-btn" target="_blank">🚕 Вызвать такси</a><a
-                        href="tel:+79289601962" class="call-btn" target="_blank">📞 Позвонить</a></div>
-            <div class="map-container">
-                <iframe src="https://yandex.ru/map-widget/v1/?pt=39.911025,43.452585&z=17&l=map" width="100%"
-                        height="100%" frameborder="0"></iframe>
-            </div>
-        </div>
-    </div>
-</section>
-<footer class="footer">
-    <div class="container"><p>© 2026 Lash Studio. Все права защищены.</p></div>
-</footer>
-<script>
-    // Глобальные переменные для выбранных значений
     let selectedRating = 5;
     let selectedEmoji = '😊';
 
-    // Инициализация звёзд и эмодзи после полной загрузки DOM
     document.addEventListener('DOMContentLoaded', function() {
-        // Звёзды
-        let selectedRating = 5;
-    const stars = document.querySelectorAll('.rating-star');
-    function updateStars(rating) {
-        stars.forEach((star, idx) => {
-            star.innerHTML = idx < rating ? '★' : '☆';
+        const stars = document.querySelectorAll('.rating-star');
+        function updateStars(rating) {
+            stars.forEach((star, idx) => {
+                star.innerHTML = idx < rating ? '★' : '☆';
+            });
+        }
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.dataset.rating);
+                updateStars(selectedRating);
+            });
         });
-    }
-    stars.forEach(star => {
-        star.addEventListener('click', function() {
-            selectedRating = parseInt(this.dataset.rating);
-            updateStars(selectedRating);
-        });
-    });
-    updateStars(5); //
+        updateStars(5);
 
-        // Эмодзи
         const emojis = document.querySelectorAll('.emoji-option');
         emojis.forEach(emoji => {
             emoji.addEventListener('click', function() {
@@ -144,52 +26,48 @@
         });
         if (emojis.length) emojis[0].classList.add('selected');
 
-        // Кнопка отправки отзыва
         document.getElementById('submitReviewBtn').addEventListener('click', submitReview);
     });
 
-    // Загрузка цен и фото услуг
     async function loadPricesAndImages() {
-    const [pricesRes, contentRes] = await Promise.all([
-        fetch('/api/prices'),
-        fetch('/api/content')
-    ]);
-    const p = await pricesRes.json();
-    const c = await contentRes.json();
+        const [pricesRes, contentRes] = await Promise.all([
+            fetch('/api/prices'),
+            fetch('/api/content')
+        ]);
+        const p = await pricesRes.json();
+        const c = await contentRes.json();
 
-    // Находим минимальную цену на ресницы из всех объёмов
-    const lashesPrices = [p.lashes_1d, p.lashes_1_5d, p.lashes_2d, p.lashes_3d].filter(v => v);
-    const minLashesPrice = lashesPrices.length ? Math.min(...lashesPrices) : 2500;
+        const lashesPrices = [p.lashes_1d, p.lashes_1_5d, p.lashes_2d, p.lashes_3d].filter(v => v);
+        const minLashesPrice = lashesPrices.length ? Math.min(...lashesPrices) : 2500;
 
-    document.getElementById('servicesGrid').innerHTML = `
-        <div class="service-card">
-            <div class="service-img" style="background-image: url('${c.service_lashes_img || 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=400'}')"></div>
-            <div class="service-content">
-                <h3>Наращивание ресниц</h3>
-                <div class="price">от ${minLashesPrice} ₽</div>
-                <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
+        document.getElementById('servicesGrid').innerHTML = `
+            <div class="service-card">
+                <div class="service-img" style="background-image: url('${c.service_lashes_img || 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=400'}')"></div>
+                <div class="service-content">
+                    <h3>Наращивание ресниц</h3>
+                    <div class="price">от ${minLashesPrice} ₽</div>
+                    <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
+                </div>
             </div>
-        </div>
-        <div class="service-card">
-            <div class="service-img" style="background-image: url('${c.service_brows_img || 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400'}')"></div>
-            <div class="service-content">
-                <h3>Ламинирование бровей</h3>
-                <div class="price">от ${p.brows} ₽</div>
-                <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
+            <div class="service-card">
+                <div class="service-img" style="background-image: url('${c.service_brows_img || 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400'}')"></div>
+                <div class="service-content">
+                    <h3>Ламинирование бровей</h3>
+                    <div class="price">от ${p.brows} ₽</div>
+                    <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
+                </div>
             </div>
-        </div>
-        <div class="service-card">
-            <div class="service-img" style="background-image: url('${c.service_complex_img || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400'}')"></div>
-            <div class="service-content">
-                <h3>Комплекс: Ресницы + Брови</h3>
-                <div class="price">${p.complex} ₽</div>
-                <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
+            <div class="service-card">
+                <div class="service-img" style="background-image: url('${c.service_complex_img || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400'}')"></div>
+                <div class="service-content">
+                    <h3>Комплекс: Ресницы + Брови</h3>
+                    <div class="price">${p.complex} ₽</div>
+                    <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
+                </div>
             </div>
-        </div>
-    `;
-}
+        `;
+    }
 
-    // Загрузка одобренных отзывов
     async function loadReviews() {
         const res = await fetch('/api/comments/approved');
         const reviews = await res.json();
@@ -201,7 +79,6 @@
         document.getElementById('reviewsList').innerHTML = html || '<p>Пока нет отзывов. Будьте первым!</p>';
     }
 
-    // Отправка отзыва
     async function submitReview() {
         const name = document.getElementById('reviewName').value.trim();
         const phone = document.getElementById('reviewPhone').value.trim();
@@ -236,7 +113,6 @@
         }
     }
 
-    // Загрузка контента (адрес, телефон и т.д.)
     async function loadContent() {
         const res = await fetch('/api/content');
         const c = await res.json();
@@ -253,10 +129,6 @@
         return div.innerHTML;
     }
 
-    // Запуск всех загрузок
     loadPricesAndImages();
     loadReviews();
     loadContent();
-</script>
-</body>
-</html>
