@@ -92,10 +92,13 @@
 
 <div id="tab-prices" class="tab-content">
     <h3>💰 Управление ценами</h3>
-    <div class="price-row"><span style="width:150px;">Наращивание ресниц:</span><input type="number" id="priceLashes"> ₽<button class="btn-primary" onclick="savePrice('lashes')">Сохранить</button></div>
-    <div class="price-row"><span style="width:150px;">Ламинирование бровей:</span><input type="number" id="priceBrows"> ₽<button class="btn-primary" onclick="savePrice('brows')">Сохранить</button></div>
-    <div class="price-row"><span style="width:150px;">Комплекс (ресницы+брови):</span><input type="number" id="priceComplex"> ₽<button class="btn-primary" onclick="savePrice('complex')">Сохранить</button></div>
-    <div class="price-row"><span style="width:150px;">Предоплата (бронь):</span><input type="number" id="priceDeposit"> ₽<button class="btn-primary" onclick="savePrice('deposit')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Наращивание 1D:</span><input type="number" id="priceLashes_1d"> ₽<button class="btn-primary" onclick="savePrice('lashes_1d')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Наращивание 1.5D:</span><input type="number" id="priceLashes_1.5d"> ₽<button class="btn-primary" onclick="savePrice('lashes_1.5d')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Наращивание 2D:</span><input type="number" id="priceLashes_2d"> ₽<button class="btn-primary" onclick="savePrice('lashes_2d')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Наращивание 3D:</span><input type="number" id="priceLashes_3d"> ₽<button class="btn-primary" onclick="savePrice('lashes_3d')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Ламинирование бровей:</span><input type="number" id="priceBrows"> ₽<button class="btn-primary" onclick="savePrice('brows')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Комплекс (ресницы+брови):</span><input type="number" id="priceComplex"> ₽<button class="btn-primary" onclick="savePrice('complex')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Предоплата (бронь):</span><input type="number" id="priceDeposit"> ₽<button class="btn-primary" onclick="savePrice('deposit')">Сохранить</button></div>
 </div>
 
 <div id="tab-content" class="tab-content">
@@ -205,23 +208,30 @@ function filterBookings(status) {
         if (btn.dataset.status === status) btn.classList.add('active');
     });
     let filtered = (status === 'all') ? allBookings : allBookings.filter(b => b.status === status);
-    let html = '<table class="bookings-table"><thead><tr><th>ID</th><th>Клиент</th><th>Телефон</th><th>Услуга</th><th>Дата</th><th>Статус</th><th>Оплата</th><th>Уведомления</th><th></th></tr></thead><tbody>';
+    let html = '<table class="bookings-table"><thead><tr><th>ID</th><th>Клиент</th><th>Телефон</th><th>Услуга</th><th>Объём</th><th>Дата</th><th>Статус</th><th>Оплата</th><th>Уведомления</th><th></th></tr></thead><tbody>';
     for (const b of filtered) {
-        const service = b.service_type === 'lashes' ? 'Ресницы' : (b.service_type === 'brows' ? 'Брови' : 'Комплекс');
+        let serviceName = b.service_type === 'lashes' ? 'Ресницы' : (b.service_type === 'brows' ? 'Брови' : 'Комплекс');
+        let volumeDisplay = '';
+        if (b.service_type === 'lashes' && b.lashes_volume) {
+            volumeDisplay = b.lashes_volume.toUpperCase();
+        } else {
+            volumeDisplay = '—';
+        }
         html += `<tr>
             <td>${b.id}</td>
             <td>${escapeHtml(b.client_name)}</td>
             <td>${escapeHtml(b.client_phone)}</td>
-            <td>${service}</td>
+            <td>${serviceName}</td>
+            <td>${volumeDisplay}</td>
             <td>${new Date(b.booking_date).toLocaleString()}</td>
             <td class="status-${b.status}">${b.status}</td>
             <td>${b.paid ? '✅ Оплачено' : '❌ Не оплачено'}</td>
             <td>
                 <button class="btn-info" onclick="sendNotification(${b.id}, 'booking_confirmed')">📱 Подтв</button>
                 <button class="btn-info" onclick="sendNotification(${b.id}, 'booking_reminder')">⏰ Напом</button>
-            </td>
+             </td>
             <td><button class="btn-success" onclick="confirmBooking(${b.id})">✅</button><button class="btn-danger" onclick="cancelBooking(${b.id})">❌</button><button class="btn-warning" onclick="deleteBooking(${b.id})">🗑️</button></td>
-        </tr>`;
+         </tr>`;
     }
     html += '</tbody></table>';
     document.getElementById('bookings-container').innerHTML = html;
@@ -273,22 +283,42 @@ window.editDayHours = function(date) {
 
 window.showBookingDetail = function(id) {
     fetch(`/api/admin/booking/${id}`).then(r=>r.json()).then(b => {
-        alert(`Клиент: ${b.client_name}\nТелефон: ${b.client_phone}\nУслуга: ${b.service_type}\nСтатус: ${b.status}\nКомментарий: ${b.notes || 'Нет'}`);
+        let volumeInfo = '';
+        if (b.service_type === 'lashes' && b.lashes_volume) {
+            volumeInfo = `\nОбъём: ${b.lashes_volume.toUpperCase()}`;
+        }
+        alert(`Клиент: ${b.client_name}\nТелефон: ${b.client_phone}\nУслуга: ${b.service_type}${volumeInfo}\nСтатус: ${b.status}\nКомментарий: ${b.notes || 'Нет'}`);
     });
 };
 
 async function loadPrices() {
     const res = await fetch('/api/prices');
     const p = await res.json();
-    document.getElementById('priceLashes').value = p.lashes;
-    document.getElementById('priceBrows').value = p.brows;
-    document.getElementById('priceComplex').value = p.complex;
-    document.getElementById('priceDeposit').value = p.deposit;
+    document.getElementById('priceLashes_1d').value = p.lashes_1d || 2500;
+    document.getElementById('priceLashes_1.5d').value = p.lashes_1_5d || 2750;
+    document.getElementById('priceLashes_2d').value = p.lashes_2d || 3000;
+    document.getElementById('priceLashes_3d').value = p.lashes_3d || 3500;
+    document.getElementById('priceBrows').value = p.brows || 2000;
+    document.getElementById('priceComplex').value = p.complex || 3800;
+    document.getElementById('priceDeposit').value = p.deposit || 300;
 }
 
 async function savePrice(service) {
-    let price = document.getElementById(`price${service.charAt(0).toUpperCase() + service.slice(1)}`).value;
-    await fetch('/api/prices', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ service, price: parseInt(price) }) });
+    let priceInput = null;
+    if (service === 'lashes_1d') priceInput = document.getElementById('priceLashes_1d');
+    else if (service === 'lashes_2d') priceInput = document.getElementById('priceLashes_2d');
+    else if (service === 'lashes_3d') priceInput = document.getElementById('priceLashes_3d');
+    else if (service === 'brows') priceInput = document.getElementById('priceBrows');
+    else if (service === 'complex') priceInput = document.getElementById('priceComplex');
+    else if (service === 'deposit') priceInput = document.getElementById('priceDeposit');
+
+    if (!priceInput) return;
+    const price = parseInt(priceInput.value);
+    await fetch('/api/prices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ service, price: price })
+    });
     alert('Сохранено');
 }
 
@@ -410,7 +440,15 @@ async function loadFinance() {
     for (const [key, service] of Object.entries(data.service_stats)) {
         detailsHtml += `<tr><td>${service.name}</td><td>${service.count} шт</td><td>${service.total.toLocaleString()} ₽</td></tr>`;
     }
-    detailsHtml += '</tbody></table>';
+    if (data.volume_stats) {
+        detailsHtml += '<h4 style="margin-top:20px">📊 По объёмам ресниц:</h4><table class="bookings-table"><thead><tr><th>Объём</th><th>Количество</th><th>Выручка</th></tr></thead><tbody>';
+        for (const [key, vol] of Object.entries(data.volume_stats)) {
+            if (vol.count > 0) {
+                detailsHtml += `<tr><td>${vol.name}</td><td>${vol.count} шт</td><td>${vol.total.toLocaleString()} ₽</td></tr>`;
+            }
+        }
+        detailsHtml += '</tbody></table>';
+    }
     document.getElementById('financeDetails').innerHTML = detailsHtml;
     document.getElementById('monthlyChart').innerHTML = '';
 }
@@ -424,11 +462,7 @@ async function loadMonthlyStats() {
     }
     let html = '<h4>📈 Помесячная статистика</h4><table class="bookings-table"><thead><tr><th>Месяц</th><th>Количество записей</th><th>Выручка</th></tr></thead><tbody>';
     for (let i = 0; i < data.months.length; i++) {
-        html += `<tr>
-            <td>${data.months[i]}</td>
-            <td>${data.counts[i]} шт</td>
-            <td>${data.revenues[i].toLocaleString()} ₽</td>
-        </tr>`;
+        html += `<tr><td>${data.months[i]}</td><td>${data.counts[i]} шт</td><td>${data.revenues[i].toLocaleString()} ₽</td></tr>`;
     }
     html += '</tbody></table>';
     document.getElementById('monthlyChart').innerHTML = html;

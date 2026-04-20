@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Float
 from datetime import datetime
 from app.database import Base
-import json
 
 class Booking(Base):
     __tablename__ = "bookings"
@@ -9,6 +8,7 @@ class Booking(Base):
     client_name = Column(String(100), nullable=False)
     client_phone = Column(String(20), nullable=False)
     service_type = Column(String(50), nullable=False)
+    lashes_volume = Column(String(10), nullable=True)  # 1d, 2d, 3d — только для ресниц
     booking_date = Column(DateTime, nullable=False)
     status = Column(String(20), default="pending")
     amount = Column(Float, default=300.0)

@@ -249,3 +249,9 @@ async def manual_booking(booking_data: dict, db: AsyncSession = Depends(get_db))
     await db.commit()
     await db.refresh(db_booking)
     return {"ok": True, "id": db_booking.id}
+
+
+@router.get("/bookings", response_model=List[BookingResponse])
+async def get_bookings(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Booking).order_by(Booking.booking_date.desc()))
+    return result.scalars().all()
