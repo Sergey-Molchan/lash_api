@@ -64,6 +64,7 @@ class BookingResponse(BaseModel):
     client_name: str
     client_phone: str
     service_type: str
+    lashes_volume: Optional[str] = None
     booking_date: datetime
     status: str
     notes: Optional[str] = None
@@ -88,6 +89,7 @@ async def get_booking(booking_id: int, db: AsyncSession = Depends(get_db)):
         "client_name": booking.client_name,
         "client_phone": booking.client_phone,
         "service_type": booking.service_type,
+        "lashes_volume": booking.lashes_volume,
         "booking_date": booking.booking_date.isoformat(),
         "status": booking.status,
         "notes": booking.notes
@@ -241,17 +243,12 @@ async def manual_booking(booking_data: dict, db: AsyncSession = Depends(get_db))
         client_name=booking_data.get("client_name"),
         client_phone=booking_data.get("client_phone"),
         service_type=booking_data.get("service_type"),
+        lashes_volume=booking_data.get("lashes_volume"),
         booking_date=booking_date,
-        status="confirmed",  # админ подтверждает сразу
+        status="confirmed",
         notes=booking_data.get("comment", "")
     )
     db.add(db_booking)
     await db.commit()
     await db.refresh(db_booking)
     return {"ok": True, "id": db_booking.id}
-
-
-@router.get("/bookings", response_model=List[BookingResponse])
-async def get_bookings(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Booking).order_by(Booking.booking_date.desc()))
-    return result.scalars().all()

@@ -76,6 +76,7 @@ async def get_booked_slots(date: str, db: AsyncSession = Depends(get_db)):
             "client_name": b.client_name,
             "client_phone": b.client_phone,
             "service_type": b.service_type,
+            "lashes_volume": b.lashes_volume,
             "start_time": b.booking_date.strftime("%H:%M"),
             "end_time": end_time.strftime("%H:%M"),
             "duration": duration,

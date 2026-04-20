@@ -56,6 +56,7 @@ async def get_month_finance(year: int, month: int, db: AsyncSession = Depends(ge
     # Статистика по объёмам ресниц
     volume_stats = {
         "1d": {"name": "1D (классика)", "count": 0, "total": 0},
+        "1.5d": {"name": "1.5D (полуторный)", "count": 0, "total": 0},
         "2d": {"name": "2D (полуобъём)", "count": 0, "total": 0},
         "3d": {"name": "3D (объём)", "count": 0, "total": 0}
     }

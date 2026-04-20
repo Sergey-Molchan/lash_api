@@ -4,7 +4,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.database import get_db
 from app.models import Booking
-from app.redis_client import get_redis
 
 router = APIRouter(prefix="/api/notifications", tags=["notifications"])
 
@@ -21,10 +20,9 @@ TEMPLATES = {
 async def send_notification(
         booking_id: int,
         type: str,
-        db: AsyncSession = Depends(get_db),
-        redis=Depends(get_redis)
+        db: AsyncSession = Depends(get_db)
 ):
-    """Отправить уведомление (в очередь Redis)"""
+    """Отправить уведомление (временно отключено)"""
     if type not in TEMPLATES:
         raise HTTPException(400, "Неизвестный тип уведомления")
 
@@ -41,13 +39,7 @@ async def send_notification(
         address="ул. Голубые Дали, 78, Адлер"
     )
 
-    # Отправляем в очередь Redis
-    sms_data = {
-        "booking_id": booking_id,
-        "phone": booking.client_phone,
-        "text": message,
-        "type": type
-    }
+    # Временно: просто выводим в лог, вместо отправки в Redis
+    print(f"📱 Уведомление для {booking.client_phone}: {message}")
 
-    await redis.lpush("sms_queue", json.dumps(sms_data))
-    return {"ok": True, "message": f"Уведомление отправлено в очередь"}
+    return {"ok": True, "message": "Уведомление (отладочный режим)"}
