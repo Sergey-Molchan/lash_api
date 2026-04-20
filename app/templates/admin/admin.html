@@ -305,32 +305,50 @@ async function loadPrices() {
 
 async function savePrice(service) {
     let priceInput = null;
-    if (service === 'lashes_1d') priceInput = document.getElementById('priceLashes_1d');
-    else if (service === 'lashes_1.5d') priceInput = document.getElementById('priceLashes_1.5d');
-    else if (service === 'lashes_2d') priceInput = document.getElementById('priceLashes_2d');
-    else if (service === 'lashes_3d') priceInput = document.getElementById('priceLashes_3d');
-    else if (service === 'brows') priceInput = document.getElementById('priceBrows');
-    else if (service === 'complex') priceInput = document.getElementById('priceComplex');
-    else if (service === 'deposit') priceInput = document.getElementById('priceDeposit');
+
+    // Маппинг сервисов на ID полей
+    const serviceMap = {
+        'lashes_1d': 'priceLashes_1d',
+        'lashes_1.5d': 'priceLashes_1.5d',
+        'lashes_2d': 'priceLashes_2d',
+        'lashes_3d': 'priceLashes_3d',
+        'brows': 'priceBrows',
+        'complex': 'priceComplex',
+        'deposit': 'priceDeposit'
+    };
+
+    priceInput = document.getElementById(serviceMap[service]);
 
     if (!priceInput) {
-        alert('Ошибка: поле не найдено');
+        alert('Ошибка: поле не найдено для ' + service);
         return;
     }
+
     const price = parseInt(priceInput.value);
     if (isNaN(price)) {
         alert('Введите корректную цену');
         return;
     }
-    const response = await fetch('/api/prices', {  // ← ДОБАВЛЕН СЛЕШ В КОНЦЕ!
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ service, price: price })
-    });
-    if (response.ok) {
-        alert('✅ Цена сохранена');
-    } else {
-        alert('❌ Ошибка сохранения');
+
+    console.log('Сохраняем:', service, '=', price);
+
+    try {
+        const response = await fetch('/api/prices', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ service: service, price: price })
+        });
+
+        if (response.ok) {
+            alert('✅ Цена сохранена');
+            loadPrices(); // перезагружаем цены в форме
+        } else {
+            const error = await response.json();
+            alert('❌ Ошибка: ' + (error.detail || 'Неизвестная ошибка'));
+        }
+    } catch(e) {
+        console.error('Ошибка:', e);
+        alert('❌ Ошибка соединения');
     }
 }
 
