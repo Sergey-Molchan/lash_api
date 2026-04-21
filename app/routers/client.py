@@ -49,6 +49,7 @@ async def create_booking(booking: BookingCreate, db: AsyncSession = Depends(get_
     duration = SERVICE_DURATION.get(booking.service_type, 1.0)
     booking_end = booking.booking_date + timedelta(hours=duration)
 
+    # Проверяем пересечения с существующими записями
     existing_bookings = await db.execute(
         select(Booking).where(
             Booking.booking_date >= booking.booking_date - timedelta(hours=3),
@@ -56,10 +57,19 @@ async def create_booking(booking: BookingCreate, db: AsyncSession = Depends(get_
             Booking.status.in_(['pending', 'confirmed'])
         )
     )
+
     for existing in existing_bookings.scalars().all():
         existing_end = existing.booking_date + timedelta(hours=SERVICE_DURATION.get(existing.service_type, 1.0))
         if not (booking.booking_date >= existing_end or booking_end <= existing.booking_date):
-            raise HTTPException(400, "Это время уже занято. Выберите другое время")
+            duration_hours = int(duration)
+            duration_min = int((duration % 1) * 60)
+            duration_text = f"{duration_hours} ч {duration_min} мин" if duration_min > 0 else f"{duration_hours} ч"
+
+            raise HTTPException(
+                400,
+                f"❌ Время {booking.booking_date.strftime('%H:%M')} не подходит для {booking.service_type} (длительность {duration_text}). "
+                f"Выберите время, когда будет свободно {duration_text} подряд."
+            )
 
     db_booking = Booking(
         client_name=booking.client_name,
