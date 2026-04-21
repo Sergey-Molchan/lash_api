@@ -38,7 +38,7 @@
             '/api/content/',
             '/api/home-images/',
             '/api/prices/',
-            '/api/comments/approved'
+            '/api/comments/approved/'
         ];
 
         for (const api of apis) {
