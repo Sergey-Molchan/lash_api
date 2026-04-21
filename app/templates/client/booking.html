@@ -20,6 +20,8 @@
             <option value="brows">Ламинирование бровей (1 час)</option>
             <option value="complex">Комплекс (ресницы+брови) (3 часа)</option>
         </select></div>
+
+        <!-- БЛОК ВЫБОРА ОБЪЁМА РЕСНИЦ -->
         <div class="form-group" id="lashesVolumeGroup" style="display:none;">
             <label>💎 Объём ресниц</label>
             <select id="lashesVolume">
@@ -30,6 +32,7 @@
             </select>
             <div class="info-text" id="priceInfo">💰 Загрузка цен...</div>
         </div>
+
         <div class="form-group"><label>📅 Дата</label><input type="date" id="bookingDate" class="calendar-input"></div>
         <div class="form-group"><label>⏰ Время</label>
             <div id="timeSlots" class="time-slots">
@@ -121,7 +124,6 @@
 
         const bookingDateTime = `${date}T${selectedTime}:00`;
 
-        // Формируем тело запроса
         const requestBody = {
             client_name: name,
             client_phone: phone,
@@ -130,7 +132,6 @@
             comment: comment
         };
 
-        // Добавляем объём только для ресниц
         if (service === 'lashes') {
             requestBody.lashes_volume = lashesVolume;
         }
