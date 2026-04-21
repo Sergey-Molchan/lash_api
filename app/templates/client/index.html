@@ -192,13 +192,14 @@
         document.getElementById('submitReviewBtn').addEventListener('click', submitReview);
     });
 
+    // Функция с правильными относительными путями
     async function loadPricesAndImages() {
         const maxRetries = 3;
         let retries = 0;
 
         async function fetchData() {
             try {
-                // Используем относительные пути — они автоматически используют HTTPS
+                // ИСПРАВЛЕНО: Используем ТОЛЬКО относительные пути
                 const [pricesRes, homeImagesRes] = await Promise.all([
                     fetch('/api/prices'),
                     fetch('/api/home-images/')
