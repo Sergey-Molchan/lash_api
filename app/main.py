@@ -1,4 +1,3 @@
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from app.routers import content_upload, home_images
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,7 +11,8 @@ app = FastAPI(title="Lash Studio API")
 
 os.makedirs("app/static/uploads", exist_ok=True)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
-app.add_middleware(HTTPSRedirectMiddleware)
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://www.lash-saundra.online", "https://lash-saundra.online"],
