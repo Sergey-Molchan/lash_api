@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Портфолио - Lash Studio</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,7 +20,7 @@
         .header-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
         .logo { font-size: 28px; font-weight: 700; }
         .logo span { color: #e94560; }
-        .nav { display: flex; gap: 32px; align-items: center; }
+        .nav { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
         .nav a { color: white; text-decoration: none; font-weight: 500; transition: 0.3s; }
         .nav a:hover { color: #e94560; }
         .btn-book { background: #e94560; padding: 10px 28px; border-radius: 40px; }
@@ -86,10 +86,21 @@
             padding: 30px 0;
             text-align: center;
         }
+
+        /* ===== АДАПТИВ ДЛЯ ТЕЛЕФОНОВ ===== */
         @media (max-width: 768px) {
-            .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-            .section-title { font-size: 32px; }
-            .nav { gap: 16px; }
+            .header-inner { flex-direction: column; gap: 15px; }
+            .nav { gap: 20px; justify-content: center; }
+            .nav a { font-size: 14px; }
+            .btn-book { padding: 8px 20px; }
+            .portfolio-section { padding: 180px 0 60px; }
+            .section-title { font-size: 28px; margin-bottom: 30px; }
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+            .gallery-item img { height: 180px; }
+            .gallery-item p { font-size: 11px; padding: 8px; }
         }
     </style>
 </head>
@@ -129,7 +140,6 @@
             const images = await res.json();
             let html = '';
             for (const img of images) {
-                // Приоритет: описание → название → пустая строка
                 const displayText = img.description || img.title || '';
                 html += `
                     <div class="gallery-item" onclick="openModal('${img.url}')">

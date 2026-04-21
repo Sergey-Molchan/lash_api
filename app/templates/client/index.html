@@ -11,8 +11,8 @@
         .container{max-width:1300px;margin:0 auto;padding:0 24px}
         .header-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
         .logo{font-size:28px;font-weight:700}.logo span{color:#e94560}
-        .nav{display:flex;gap:30px;align-items:center}
-        .nav a{color:white;text-decoration:none}
+        .nav{display:flex;gap:30px;align-items:center;flex-wrap:wrap}
+        .nav a{color:white;text-decoration:none;font-size:16px}
         .btn-book{background:#e94560;padding:10px 25px;border-radius:40px}
         .hero{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:160px 0 100px;text-align:center}
         .hero h1{font-size:52px;margin-bottom:20px}
@@ -47,7 +47,31 @@
         .footer{background:#1a1a2e;color:white;padding:40px 0;text-align:center}
         .taxi-btn{display:inline-block;background:#ff9800;color:white;padding:12px 30px;border-radius:50px;text-decoration:none;font-weight:600;margin-top:20px;margin-right:10px}
         .call-btn{display:inline-block;background:#4caf50;color:white;padding:12px 30px;border-radius:50px;text-decoration:none;font-weight:600;margin-top:20px}
-        @media(max-width:768px){.hero h1{font-size:32px}.contact-grid{grid-template-columns:1fr}.nav{display:none}}
+
+        /* ===== АДАПТИВ ДЛЯ ТЕЛЕФОНОВ ===== */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 32px; }
+            .contact-grid { grid-template-columns: 1fr; }
+            .header-inner { flex-direction: column; gap: 15px; }
+            .nav {
+                display: flex !important;
+                gap: 20px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .nav a { font-size: 14px; }
+            .btn-book { padding: 8px 20px; }
+            .hero { padding: 200px 0 80px; }
+            .services-grid { grid-template-columns: 1fr; }
+            .section-title { font-size: 28px; }
+            .service-img { height: 200px; }
+            .review-card { padding: 15px; }
+            .add-review { padding: 20px; }
+            .emoji-option { font-size: 20px; }
+            .taxi-btn, .call-btn { padding: 8px 20px; font-size: 14px; }
+            .footer p { font-size: 12px; }
+        }
+
         .emoji-option.selected { background: #e94560; color: white; }
     </style>
 </head>
