@@ -108,7 +108,6 @@
     </div>
 </section>
 <footer class="footer">
-    <a href="/add-to-home">📱 Добавить на экран «Домой»</a>
     <div class="container"><p>© 2026 Lash Studio. Все права защищены.</p></div>
 </footer>
 <script>
@@ -146,8 +145,8 @@
     async function loadPricesAndImages() {
         try {
             const [pricesRes, contentRes] = await Promise.all([
-                fetch('/api/prices'),
-                fetch('/api/content')
+                fetch('https://www.lash-saundra.online/api/prices'),
+                fetch('https://www.lash-saundra.online/api/content')
             ]);
 
             if (!pricesRes.ok || !contentRes.ok) {
@@ -194,7 +193,7 @@
 
     async function loadReviews() {
         try {
-            const res = await fetch('/api/comments/approved');
+            const res = await fetch('https://www.lash-saundra.online/api/comments/approved');
             if (!res.ok) throw new Error('Ошибка загрузки отзывов');
             const reviews = await res.json();
             let html = '';
@@ -229,7 +228,7 @@
             return;
         }
         try {
-            const res = await fetch('/api/comments/add', {
+            const res = await fetch('https://www.lash-saundra.online/api/comments/add', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -258,7 +257,7 @@
 
     async function loadContent() {
         try {
-            const res = await fetch('/api/content');
+            const res = await fetch('https://www.lash-saundra.online/api/content');
             if (!res.ok) throw new Error('Ошибка загрузки контента');
             const c = await res.json();
             document.getElementById('heroTitle').innerText = c.hero_title || '✨ Идеальный взгляд начинается здесь';
