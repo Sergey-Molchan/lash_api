@@ -27,24 +27,50 @@ class BookingCreate(BaseModel):
 
     @field_validator('client_phone')
     def validate_phone(cls, v):
+        # Удаляем все не-цифры и плюс
         cleaned = re.sub(r'[^0-9+]', '', v)
+
+        # Если пусто
+        if not cleaned or len(cleaned) == 0:
+            raise HTTPException(400, '❌ Пожалуйста, введите номер телефона')
+
+        # Подсчет цифр
+        digits_only = re.sub(r'[^0-9]', '', cleaned)
+
+        # Проверка длины
+        if len(digits_only) < 10:
+            missing = 10 - len(digits_only)
+            word = 'цифры' if missing == 1 else 'цифр'
+            raise HTTPException(400, f'❌ В вашем номере не хватает {missing} {word}. Пример: +7 999 123 45 67')
+
+        if len(digits_only) > 11:
+            raise HTTPException(400, '❌ Номер телефона слишком длинный (максимум 11 цифр)')
+
+        # Приводим к формату +7XXXXXXXXXX
         if cleaned.startswith('+7') and len(cleaned) == 12:
             return cleaned
         elif cleaned.startswith('8') and len(cleaned) == 11:
             return '+7' + cleaned[1:]
         elif cleaned.startswith('7') and len(cleaned) == 11:
             return '+7' + cleaned[1:]
-        elif len(cleaned) == 10:
-            return '+7' + cleaned
-        elif len(cleaned) == 11 and not cleaned.startswith('+'):
-            return '+7' + cleaned[1:]
-        raise ValueError('Неверный формат номера телефона')
+        elif len(digits_only) == 10:
+            return '+7' + digits_only
+        elif len(digits_only) == 11:
+            if digits_only.startswith('7'):
+                return '+7' + digits_only[1:]
+            elif digits_only.startswith('8'):
+                return '+7' + digits_only[1:]
+            else:
+                return '+7' + digits_only
+        else:
+            raise HTTPException(400, '❌ Неверный формат номера телефона. Пример: +7 999 123 45 67')
 
 
 @router.post("/book", response_model=dict)
 async def create_booking(booking: BookingCreate, db: AsyncSession = Depends(get_db)):
+    # Проверка даты в будущем
     if booking.booking_date <= datetime.now():
-        raise HTTPException(400, "Дата должна быть в будущем")
+        raise HTTPException(400, "❌ Дата записи должна быть в будущем")
 
     duration = SERVICE_DURATION.get(booking.service_type, 1.0)
     booking_end = booking.booking_date + timedelta(hours=duration)
@@ -84,55 +110,4 @@ async def create_booking(booking: BookingCreate, db: AsyncSession = Depends(get_
     await db.commit()
     await db.refresh(db_booking)
 
-    return {"id": db_booking.id, "status": "pending", "message": "Запись создана"}
-
-
-@router.get("/available-slots")
-async def get_available_slots(date: str, db: AsyncSession = Depends(get_db)):
-    target_date = datetime.fromisoformat(date).date()
-
-    wh_result = await db.execute(
-        select(WorkingHours).where(WorkingHours.date == target_date, WorkingHours.is_day_off == True))
-    if wh_result.scalar_one_or_none():
-        return {"slots": [], "is_day_off": True}
-
-    dh_result = await db.execute(select(DayHours).where(DayHours.date == date))
-    day_hours = dh_result.scalar_one_or_none()
-
-    all_slots = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00']
-    closed_hours = json.loads(day_hours.closed_hours) if day_hours and day_hours.closed_hours else []
-    break_start = day_hours.break_start if day_hours else None
-    break_end = day_hours.break_end if day_hours else None
-
-    available = [slot for slot in all_slots if slot not in closed_hours]
-
-    if break_start and break_end:
-        break_hours = []
-        current = datetime.strptime(break_start, "%H:%M")
-        end = datetime.strptime(break_end, "%H:%M")
-        while current < end:
-            break_hours.append(current.strftime("%H:%M"))
-            current += timedelta(hours=1)
-        available = [slot for slot in available if slot not in break_hours]
-
-    start = datetime.combine(target_date, datetime.min.time())
-    end = datetime.combine(target_date, datetime.max.time())
-    booked_result = await db.execute(
-        select(Booking).where(
-            Booking.booking_date >= start,
-            Booking.booking_date <= end,
-            Booking.status.in_(['pending', 'confirmed'])
-        )
-    )
-
-    booked_slots = set()
-    for b in booked_result.scalars().all():
-        duration = SERVICE_DURATION.get(b.service_type, 1.0)
-        slot_time = b.booking_date
-        for i in range(int(duration) + (1 if duration % 1 > 0 else 0)):
-            hour = (slot_time + timedelta(hours=i)).strftime("%H:%M")
-            if hour >= "10:00" and hour <= "19:00":
-                booked_slots.add(hour)
-
-    final_slots = [slot for slot in available if slot not in booked_slots]
-    return {"slots": final_slots, "is_day_off": False}
+    return {"id": db_booking.id, "status": "pending", "message": "✅ Запись создана! Ожидайте подтверждения."}

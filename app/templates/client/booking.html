@@ -14,7 +14,7 @@
     <div id="message" class="message"></div>
     <form id="bookingForm">
         <div class="form-group"><label>👤 Ваше имя</label><input type="text" id="clientName" required></div>
-        <div class="form-group"><label>📞 Телефон</label><input type="tel" id="clientPhone" placeholder="+7 (928) 960-19-62" required></div>
+        <div class="form-group"><label>📞 Телефон</label><input type="tel" id="clientPhone" placeholder="+7 928 960 19 62" required></div>
         <div class="form-group"><label>💇 Услуга</label><select id="serviceType">
             <option value="complex">Комплекс (ресницы+брови) (3 часа)</option>
             <option value="brows">Ламинирование бровей (1 час)</option>
@@ -47,9 +47,63 @@
     let selectedTime = null;
     let prices = {};
 
+    // ========== ФУНКЦИЯ ВАЛИДАЦИИ ТЕЛЕФОНА ==========
+    function validatePhone(phone) {
+        // Удаляем все не-цифры
+        const digitsOnly = phone.replace(/[^0-9]/g, '');
+
+        if (!digitsOnly || digitsOnly.length === 0) {
+            return { valid: false, message: '❌ Пожалуйста, введите номер телефона' };
+        }
+
+        // Проверка длины
+        if (digitsOnly.length < 10) {
+            const missing = 10 - digitsOnly.length;
+            const word = missing === 1 ? 'цифры' : 'цифр';
+            return {
+                valid: false,
+                message: `❌ В вашем номере не хватает ${missing} ${word}. Пример: +7 928 960 19 62`
+            };
+        }
+
+        if (digitsOnly.length > 11) {
+            return { valid: false, message: '❌ Номер телефона слишком длинный (максимум 11 цифр)' };
+        }
+
+        return { valid: true, message: '' };
+    }
+
+    // ========== ФУНКЦИЯ ФОРМАТИРОВАНИЯ ТЕЛЕФОНА ==========
+    function formatPhone(input) {
+        let value = input.value.replace(/[^0-9]/g, '');
+
+        if (value.length === 0) {
+            input.value = '';
+            return;
+        }
+
+        // Ограничиваем 11 цифрами
+        if (value.length > 11) {
+            value = value.slice(0, 11);
+        }
+
+        // Форматируем как +7 XXX XXX XX XX
+        let formatted = '';
+        if (value.length >= 1) {
+            formatted = '+7';
+            if (value.length > 1) formatted += ' ' + value.slice(1, 4);
+            if (value.length >= 4) formatted += ' ' + value.slice(4, 7);
+            if (value.length >= 7) formatted += ' ' + value.slice(7, 9);
+            if (value.length >= 9) formatted += ' ' + value.slice(9, 11);
+        }
+
+        input.value = formatted.trim();
+    }
+
+    // ========== ЗАГРУЗКА ЦЕН ==========
     async function loadPrices() {
         try {
-            const res = await fetch('/api/prices');
+            const res = await fetch('/api/prices/');
             if (res.ok) {
                 prices = await res.json();
                 const select = document.getElementById('lashesVolume');
@@ -67,10 +121,25 @@
     }
     loadPrices();
 
+    // ========== ОБРАБОТЧИКИ ==========
     // Показываем выбор объёма только для ресниц
     document.getElementById('serviceType').addEventListener('change', function() {
         const group = document.getElementById('lashesVolumeGroup');
         group.style.display = this.value === 'lashes' ? 'block' : 'none';
+    });
+
+    // Форматирование телефона при вводе
+    const phoneInput = document.getElementById('clientPhone');
+    phoneInput.addEventListener('input', function() {
+        formatPhone(this);
+    });
+
+    // Валидация телефона при потере фокуса
+    phoneInput.addEventListener('blur', function() {
+        const validation = validatePhone(this.value);
+        if (!validation.valid && this.value.trim() !== '') {
+            showMessage(validation.message, 'error');
+        }
     });
 
     const tomorrow = new Date();
@@ -109,8 +178,10 @@
         selectedTime = time;
     };
 
+    // ========== ОТПРАВКА ФОРМЫ ==========
     document.getElementById('bookingForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+
         const name = document.getElementById('clientName').value.trim();
         const phone = document.getElementById('clientPhone').value.trim();
         const service = document.getElementById('serviceType').value;
@@ -118,9 +189,28 @@
         const date = document.getElementById('bookingDate').value;
         const comment = document.getElementById('comment').value;
 
-        if (!name || !phone) { showMessage('Заполните имя и телефон', 'error'); return; }
-        if (!date) { showMessage('Выберите дату', 'error'); return; }
-        if (!selectedTime) { showMessage('Выберите время', 'error'); return; }
+        // Валидация имени
+        if (!name) {
+            showMessage('❌ Пожалуйста, введите ваше имя', 'error');
+            return;
+        }
+
+        // Валидация телефона
+        const phoneValidation = validatePhone(phone);
+        if (!phoneValidation.valid) {
+            showMessage(phoneValidation.message, 'error');
+            return;
+        }
+
+        if (!date) {
+            showMessage('❌ Выберите дату', 'error');
+            return;
+        }
+
+        if (!selectedTime) {
+            showMessage('❌ Выберите время', 'error');
+            return;
+        }
 
         const bookingDateTime = `${date}T${selectedTime}:00`;
 
@@ -169,7 +259,10 @@
         msg.textContent = text;
         msg.className = `message ${type}`;
         msg.style.display = 'block';
-        setTimeout(() => msg.style.display = 'none', 5000);
+        setTimeout(() => {
+            msg.style.display = 'none';
+            msg.textContent = '';
+        }, 5000);
     }
 </script>
 </body>
