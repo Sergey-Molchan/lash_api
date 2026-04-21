@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta charset="UTF-8"><meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>Lash Studio - Админ панель</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
@@ -288,7 +287,7 @@
                 <td><button class="btn-success" onclick="confirmBooking(${b.id})">✅</button><button class="btn-danger" onclick="cancelBooking(${b.id})">❌</button><button class="btn-warning" onclick="deleteBooking(${b.id})">🗑️</button></td>
              </tr>`;
         }
-        html += '</tbody></table>';
+        html += '</tbody><td>';
         document.getElementById('bookings-container').innerHTML = html;
     }
 
@@ -517,7 +516,7 @@
                 <div class="finance-stat"><h3>💵 Средний чек</h3><div class="value">${Math.round(data.total_amount / data.total_bookings || 0).toLocaleString()} ₽</div></div>
             </div>
         `;
-        let detailsHtml = '<h4 style="margin-top:20px">📋 Детали по услугам:</h4><table class="bookings-table"><thead><tr><th>Услуга</th><th>Количество</th><th>Выручка</th></tr></thead><tbody>';
+        let detailsHtml = '<h4 style="margin-top:20px">📋 Детали по услугам:</h4><table class="bookings-table"><thead><tr><th>Услуга</th><th>Количество</th><th>Выручка</th><tr></thead><tbody>';
         for (const [key, service] of Object.entries(data.service_stats)) {
             detailsHtml += `<tr><td>${service.name}</td><td>${service.count} шт</td><td>${service.total.toLocaleString()} ₽</td></tr>`;
         }
