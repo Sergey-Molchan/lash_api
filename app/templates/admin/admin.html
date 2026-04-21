@@ -583,10 +583,13 @@ async function uploadImageToContent(type) {
     formData.append('file', fileInput.files[0]);
 
     try {
-        const res = await fetch('/api/gallery/upload', { method: 'POST', body: formData });
+        // ИЗМЕНЁННЫЙ URL — больше не использует галерею!
+        const res = await fetch('/api/content-upload/', {
+            method: 'POST',
+            body: formData
+        });
         const data = await res.json();
         if (res.ok) {
-            // Обновляем поле URL
             document.getElementById(fieldId).value = data.url;
             alert('✅ Фото загружено! Не забудьте нажать "Сохранить все"');
         } else {
@@ -595,6 +598,7 @@ async function uploadImageToContent(type) {
     } catch(e) {
         alert('❌ Ошибка соединения');
     }
+}
 }
 
     loadCalendar();
