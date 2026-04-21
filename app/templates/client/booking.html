@@ -20,7 +20,7 @@
             <option value="brows">Ламинирование бровей (1 час)</option>
             <option value="complex">Комплекс (ресницы+брови) (3 часа)</option>
         </select></div>
-        <div class="form-group" id="lashesVolumeGroup" style="display:block;">
+        <div class="form-group" id="lashesVolumeGroup" style="display:none;">
             <label>💎 Объём ресниц</label>
             <select id="lashesVolume">
                 <option value="1d">1D (классика)</option>
@@ -63,6 +63,12 @@
         } catch(e) { console.error('Ошибка загрузки цен:', e); }
     }
     loadPrices();
+
+    // Показываем выбор объёма только для ресниц
+    document.getElementById('serviceType').addEventListener('change', function() {
+        const group = document.getElementById('lashesVolumeGroup');
+        group.style.display = this.value === 'lashes' ? 'block' : 'none';
+    });
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -115,24 +121,30 @@
 
         const bookingDateTime = `${date}T${selectedTime}:00`;
 
+        // Формируем тело запроса
+        const requestBody = {
+            client_name: name,
+            client_phone: phone,
+            service_type: service,
+            booking_date: bookingDateTime,
+            comment: comment
+        };
+
+        // Добавляем объём только для ресниц
+        if (service === 'lashes') {
+            requestBody.lashes_volume = lashesVolume;
+        }
+
         try {
             const res = await fetch('/api/client/book', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    client_name: name,
-                    client_phone: phone,
-                    service_type: service,
-                    lashes_volume: service === 'lashes' ? lashesVolume : null,
-                    booking_date: bookingDateTime,
-                    comment: comment
-                })
+                body: JSON.stringify(requestBody)
             });
 
             const result = await res.json();
 
             if (res.ok) {
-                // РЕДИРЕКТ НА СТРАНИЦУ СПАСИБО
                 const params = new URLSearchParams({
                     name: name,
                     date: date,
@@ -142,14 +154,7 @@
                 });
                 window.location.href = `/thankyou?${params.toString()}`;
             } else {
-                let errorMsg = 'Неизвестная ошибка';
-                if (result.detail) {
-                    errorMsg = result.detail;
-                } else if (typeof result === 'string') {
-                    errorMsg = result;
-                } else if (result.message) {
-                    errorMsg = result.message;
-                }
+                let errorMsg = result.detail || 'Неизвестная ошибка';
                 showMessage(`❌ ${errorMsg}`, 'error');
             }
         } catch(e) {
