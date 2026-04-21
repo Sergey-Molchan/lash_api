@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8"><meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>Lash Studio - Админ панель</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
@@ -65,7 +66,9 @@
     </style>
 </head>
 <body>
-<div class="header"><h1>📅 Lash Studio - Админ панель</h1><button class="logout-btn" onclick="location.href='/api/admin/logout'">🚪 Выйти</button></div>
+<div class="header"><h1>📅 Lash Studio - Админ панель</h1>
+    <button class="logout-btn" onclick="location.href='/api/admin/logout'">🚪 Выйти</button>
+</div>
 
 <div class="tabs">
     <div class="tab active" onclick="showTab('calendar')">📅 Календарь</div>
@@ -77,12 +80,15 @@
     <div class="tab" onclick="showTab('finance')">📊 Финансы</div>
 </div>
 
-<div id="tab-calendar" class="tab-content active"><div id="calendar-container">Загрузка...</div></div>
+<div id="tab-calendar" class="tab-content active">
+    <div id="calendar-container">Загрузка...</div>
+</div>
 
 <div id="tab-bookings" class="tab-content">
     <div style="margin-bottom:15px;">
         <button class="filter-btn active" data-status="all" onclick="filterBookings('all')">📋 Все</button>
-        <button class="filter-btn" data-status="confirmed" onclick="filterBookings('confirmed')">✅ Подтверждённые</button>
+        <button class="filter-btn" data-status="confirmed" onclick="filterBookings('confirmed')">✅ Подтверждённые
+        </button>
         <button class="filter-btn" data-status="pending" onclick="filterBookings('pending')">⏳ Ожидают</button>
         <button class="filter-btn" data-status="cancelled" onclick="filterBookings('cancelled')">❌ Отменённые</button>
     </div>
@@ -92,13 +98,31 @@
 
 <div id="tab-prices" class="tab-content">
     <h3>💰 Управление ценами</h3>
-    <div class="price-row"><span style="width:180px;">Наращивание 1D:</span><input type="number" id="priceLashes_1d"> ₽<button class="btn-primary" onclick="savePrice('lashes_1d')">Сохранить</button></div>
-    <div class="price-row"><span style="width:180px;">Наращивание 1.5D:</span><input type="number" id="priceLashes_1.5d"> ₽<button class="btn-primary" onclick="savePrice('lashes_1_5d')">Сохранить</button></div>
-    <div class="price-row"><span style="width:180px;">Наращивание 2D:</span><input type="number" id="priceLashes_2d"> ₽<button class="btn-primary" onclick="savePrice('lashes_2d')">Сохранить</button></div>
-    <div class="price-row"><span style="width:180px;">Наращивание 3D:</span><input type="number" id="priceLashes_3d"> ₽<button class="btn-primary" onclick="savePrice('lashes_3d')">Сохранить</button></div>
-    <div class="price-row"><span style="width:180px;">Ламинирование бровей:</span><input type="number" id="priceBrows"> ₽<button class="btn-primary" onclick="savePrice('brows')">Сохранить</button></div>
-    <div class="price-row"><span style="width:180px;">Комплекс (ресницы+брови):</span><input type="number" id="priceComplex"> ₽<button class="btn-primary" onclick="savePrice('complex')">Сохранить</button></div>
-    <div class="price-row"><span style="width:180px;">Предоплата (бронь):</span><input type="number" id="priceDeposit"> ₽<button class="btn-primary" onclick="savePrice('deposit')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Наращивание 1D:</span><input type="number" id="priceLashes_1d"> ₽
+        <button class="btn-primary" onclick="savePrice('lashes_1d')">Сохранить</button>
+    </div>
+    <div class="price-row"><span style="width:180px;">Наращивание 1.5D:</span><input type="number"
+                                                                                     id="priceLashes_1.5d"> ₽
+        <button class="btn-primary" onclick="savePrice('lashes_1_5d')">Сохранить</button>
+    </div>
+    <div class="price-row"><span style="width:180px;">Наращивание 2D:</span><input type="number" id="priceLashes_2d"> ₽
+        <button class="btn-primary" onclick="savePrice('lashes_2d')">Сохранить</button>
+    </div>
+    <div class="price-row"><span style="width:180px;">Наращивание 3D:</span><input type="number" id="priceLashes_3d"> ₽
+        <button class="btn-primary" onclick="savePrice('lashes_3d')">Сохранить</button>
+    </div>
+    <div class="price-row"><span style="width:180px;">Ламинирование бровей:</span><input type="number" id="priceBrows">
+        ₽
+        <button class="btn-primary" onclick="savePrice('brows')">Сохранить</button>
+    </div>
+    <div class="price-row"><span style="width:180px;">Комплекс (ресницы+брови):</span><input type="number"
+                                                                                             id="priceComplex"> ₽
+        <button class="btn-primary" onclick="savePrice('complex')">Сохранить</button>
+    </div>
+    <div class="price-row"><span style="width:180px;">Предоплата (бронь):</span><input type="number" id="priceDeposit">
+        ₽
+        <button class="btn-primary" onclick="savePrice('deposit')">Сохранить</button>
+    </div>
 </div>
 
 <div id="tab-content" class="tab-content">
@@ -108,9 +132,31 @@
     <div class="form-group"><label>О нас:</label><textarea id="about" rows="4"></textarea></div>
     <div class="form-group"><label>Адрес:</label><textarea id="address" rows="2"></textarea></div>
     <button class="btn-primary" onclick="saveContent()">💾 Сохранить все</button>
-    <div class="form-group"><label>Фото для «Наращивание ресниц» (URL)</label><input type="text" id="service_lashes_img" placeholder="/static/uploads/lashes.jpg"></div>
-    <div class="form-group"><label>Фото для «Ламинирование бровей» (URL)</label><input type="text" id="service_brows_img" placeholder="/static/uploads/brows.jpg"></div>
-    <div class="form-group"><label>Фото для «Комплекс» (URL)</label><input type="text" id="service_complex_img" placeholder="/static/uploads/complex.jpg"></div>
+    <div class="form-group"><label>Фото для «Наращивание ресниц» (URL)</label><input type="text" id="service_lashes_img"
+                                                                                     placeholder="/static/uploads/lashes.jpg">
+    </div>
+    <div class="form-group"><label>Фото для «Ламинирование бровей» (URL)</label><input type="text"
+                                                                                       id="service_brows_img"
+                                                                                       placeholder="/static/uploads/brows.jpg">
+    </div>
+    <div class="form-group"><label>Фото для «Комплекс» (URL)</label><input type="text" id="service_complex_img"
+                                                                           placeholder="/static/uploads/complex.jpg">
+    </div>
+    <div class="form-group">
+        <label>📸 Загрузить фото для «Наращивание ресниц»</label>
+        <input type="file" id="uploadLashesImg" accept="image/*">
+        <button class="btn-primary" onclick="uploadImageToContent('lashes')">Загрузить</button>
+    </div>
+    <div class="form-group">
+        <label>📸 Загрузить фото для «Ламинирование бровей»</label>
+        <input type="file" id="uploadBrowsImg" accept="image/*">
+        <button class="btn-primary" onclick="uploadImageToContent('brows')">Загрузить</button>
+    </div>
+    <div class="form-group">
+        <label>📸 Загрузить фото для «Комплекс»</label>
+        <input type="file" id="uploadComplexImg" accept="image/*">
+        <button class="btn-primary" onclick="uploadImageToContent('complex')">Загрузить</button>
+    </div>
 </div>
 
 <div id="tab-gallery" class="tab-content">
@@ -149,13 +195,22 @@
         </select>
         <label for="financeMonthSelect" style="margin-left:15px;">Месяц: </label>
         <select id="financeMonthSelect" onchange="loadFinance()">
-            <option value="1">Январь</option><option value="2">Февраль</option><option value="3">Март</option>
-            <option value="4">Апрель</option><option value="5">Май</option><option value="6">Июнь</option>
-            <option value="7">Июль</option><option value="8">Август</option><option value="9">Сентябрь</option>
-            <option value="10">Октябрь</option><option value="11">Ноябрь</option><option value="12">Декабрь</option>
+            <option value="1">Январь</option>
+            <option value="2">Февраль</option>
+            <option value="3">Март</option>
+            <option value="4">Апрель</option>
+            <option value="5">Май</option>
+            <option value="6">Июнь</option>
+            <option value="7">Июль</option>
+            <option value="8">Август</option>
+            <option value="9">Сентябрь</option>
+            <option value="10">Октябрь</option>
+            <option value="11">Ноябрь</option>
+            <option value="12">Декабрь</option>
         </select>
         <button class="btn-primary" onclick="loadFinance()">Показать</button>
-        <button class="btn-secondary" onclick="loadMonthlyStats()" style="margin-left:10px;">📈 Годовая статистика</button>
+        <button class="btn-secondary" onclick="loadMonthlyStats()" style="margin-left:10px;">📈 Годовая статистика
+        </button>
     </div>
     <div id="financeStats"></div>
     <div id="financeDetails"></div>
@@ -163,354 +218,391 @@
 </div>
 
 <script>
-let currentYear = new Date().getFullYear();
-let currentMonth = new Date().getMonth() + 1;
-let allBookings = [];
-let currentFilter = 'all';
+    let currentYear = new Date().getFullYear();
+    let currentMonth = new Date().getMonth() + 1;
+    let allBookings = [];
+    let currentFilter = 'all';
 
-function showTab(tabName) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    event.target.classList.add('active');
-    document.getElementById(`tab-${tabName}`).classList.add('active');
-    if (tabName === 'calendar') loadCalendar();
-    if (tabName === 'bookings') loadBookings();
-    if (tabName === 'prices') loadPrices();
-    if (tabName === 'content') loadContent();
-    if (tabName === 'gallery') loadGallery();
-    if (tabName === 'comments') loadComments();
-    if (tabName === 'finance') loadFinance();
-}
+    function showTab(tabName) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+        if (tabName === 'calendar') loadCalendar();
+        if (tabName === 'bookings') loadBookings();
+        if (tabName === 'prices') loadPrices();
+        if (tabName === 'content') loadContent();
+        if (tabName === 'gallery') loadGallery();
+        if (tabName === 'comments') loadComments();
+        if (tabName === 'finance') loadFinance();
+    }
 
-function changeMonth(delta) {
-    currentMonth += delta;
-    if (currentMonth < 1) { currentMonth = 12; currentYear--; }
-    if (currentMonth > 12) { currentMonth = 1; currentYear++; }
-    loadCalendar();
-}
+    function changeMonth(delta) {
+        currentMonth += delta;
+        if (currentMonth < 1) { currentMonth = 12; currentYear--; }
+        if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+        loadCalendar();
+    }
 
-async function loadCalendar() {
-    const res = await fetch(`/api/calendar/data?year=${currentYear}&month=${currentMonth}`);
-    const html = await res.text();
-    document.getElementById('calendar-container').innerHTML = html;
-}
+    async function loadCalendar() {
+        const res = await fetch(`/api/calendar/data?year=${currentYear}&month=${currentMonth}`);
+        const html = await res.text();
+        document.getElementById('calendar-container').innerHTML = html;
+    }
 
-async function loadBookings() {
-    const res = await fetch('/api/admin/bookings');
-    allBookings = await res.json();
-    filterBookings(currentFilter);
-}
+    async function loadBookings() {
+        const res = await fetch('/api/admin/bookings');
+        allBookings = await res.json();
+        filterBookings(currentFilter);
+    }
 
-function filterBookings(status) {
-    currentFilter = status;
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.status === status) btn.classList.add('active');
-    });
-    let filtered = (status === 'all') ? allBookings : allBookings.filter(b => b.status === status);
-    let html = '<table class="bookings-table"><thead><tr><th>ID</th><th>Клиент</th><th>Телефон</th><th>Услуга</th><th>Объём</th><th>Дата</th><th>Статус</th><th>Оплата</th><th>Уведомления</th><th></th></tr></thead><tbody>';
-    for (const b of filtered) {
-        let serviceName = b.service_type === 'lashes' ? 'Ресницы' : (b.service_type === 'brows' ? 'Брови' : 'Комплекс');
-        let volumeDisplay = '';
-        if (b.service_type === 'lashes' && b.lashes_volume) {
-            volumeDisplay = b.lashes_volume.toUpperCase();
+    function filterBookings(status) {
+        currentFilter = status;
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.status === status) btn.classList.add('active');
+        });
+        let filtered = (status === 'all') ? allBookings : allBookings.filter(b => b.status === status);
+        let html = '<table class="bookings-table"><thead><tr><th>ID</th><th>Клиент</th><th>Телефон</th><th>Услуга</th><th>Объём</th><th>Дата</th><th>Статус</th><th>Оплата</th><th>Уведомления</th><th></th></tr></thead><tbody>';
+        for (const b of filtered) {
+            let serviceName = b.service_type === 'lashes' ? 'Ресницы' : (b.service_type === 'brows' ? 'Брови' : 'Комплекс');
+            let volumeDisplay = '';
+            if (b.service_type === 'lashes' && b.lashes_volume) {
+                volumeDisplay = b.lashes_volume.toUpperCase();
+            } else {
+                volumeDisplay = '—';
+            }
+            html += `<tr>
+                <td>${b.id}</td>
+                <td>${escapeHtml(b.client_name)}</td>
+                <td>${escapeHtml(b.client_phone)}</td>
+                <td>${serviceName}</td>
+                <td>${volumeDisplay}</td>
+                <td>${new Date(b.booking_date).toLocaleString()}</td>
+                <td class="status-${b.status}">${b.status}</td>
+                <td>${b.paid ? '✅ Оплачено' : '❌ Не оплачено'}</td>
+                <td>
+                    <button class="btn-info" onclick="sendNotification(${b.id}, 'booking_confirmed')">📱 Подтв</button>
+                    <button class="btn-info" onclick="sendNotification(${b.id}, 'booking_reminder')">⏰ Напом</button>
+                 </td>
+                <td><button class="btn-success" onclick="confirmBooking(${b.id})">✅</button><button class="btn-danger" onclick="cancelBooking(${b.id})">❌</button><button class="btn-warning" onclick="deleteBooking(${b.id})">🗑️</button></td>
+             </tr>`;
+        }
+        html += '</tbody></table>';
+        document.getElementById('bookings-container').innerHTML = html;
+    }
+
+    async function sendNotification(bookingId, type) {
+        const res = await fetch(`/api/notifications/send/${bookingId}/${type}`, { method: 'POST' });
+        if (res.ok) {
+            alert('✅ Уведомление отправлено в очередь');
         } else {
-            volumeDisplay = '—';
-        }
-        html += `<tr>
-            <td>${b.id}</td>
-            <td>${escapeHtml(b.client_name)}</td>
-            <td>${escapeHtml(b.client_phone)}</td>
-            <td>${serviceName}</td>
-            <td>${volumeDisplay}</td>
-            <td>${new Date(b.booking_date).toLocaleString()}</td>
-            <td class="status-${b.status}">${b.status}</td>
-            <td>${b.paid ? '✅ Оплачено' : '❌ Не оплачено'}</td>
-            <td>
-                <button class="btn-info" onclick="sendNotification(${b.id}, 'booking_confirmed')">📱 Подтв</button>
-                <button class="btn-info" onclick="sendNotification(${b.id}, 'booking_reminder')">⏰ Напом</button>
-             </td>
-            <td><button class="btn-success" onclick="confirmBooking(${b.id})">✅</button><button class="btn-danger" onclick="cancelBooking(${b.id})">❌</button><button class="btn-warning" onclick="deleteBooking(${b.id})">🗑️</button></td>
-         </tr>`;
-    }
-    html += '</tbody></table>';
-    document.getElementById('bookings-container').innerHTML = html;
-}
-
-async function sendNotification(bookingId, type) {
-    const res = await fetch(`/api/notifications/send/${bookingId}/${type}`, { method: 'POST' });
-    if (res.ok) {
-        alert('✅ Уведомление отправлено в очередь');
-    } else {
-        alert('❌ Ошибка отправки');
-    }
-}
-
-async function confirmBooking(id) {
-    await fetch(`/api/admin/confirm/${id}`, { method: 'POST' });
-    loadBookings();
-    loadCalendar();
-}
-
-async function cancelBooking(id) {
-    if (!confirm('Отменить запись?')) return;
-    await fetch(`/api/admin/cancel/${id}`, { method: 'POST' });
-    loadBookings();
-    loadCalendar();
-}
-
-async function deleteBooking(id) {
-    if (!confirm('Удалить запись навсегда?')) return;
-    await fetch(`/api/booking/${id}`, { method: 'DELETE' });
-    loadBookings();
-    loadCalendar();
-}
-
-window.toggleDayOff = async function(date) {
-    const res = await fetch(`/api/admin/toggle-day-off/${date}`, { method: 'POST' });
-    const data = await res.json();
-    if (data.warning) {
-        if (confirm(data.message + '\nУдалить записи и сделать выходным?')) {
-            await fetch(`/api/admin/confirm-day-off/${date}`, { method: 'POST' });
+            alert('❌ Ошибка отправки');
         }
     }
-    await loadCalendar();
-};
 
-window.editDayHours = function(date) {
-    window.location.href = `/admin/hours?date=${date}`;
-};
+    async function confirmBooking(id) {
+        await fetch(`/api/admin/confirm/${id}`, { method: 'POST' });
+        loadBookings();
+        loadCalendar();
+    }
 
-window.showBookingDetail = function(id) {
-    fetch(`/api/admin/booking/${id}`).then(r=>r.json()).then(b => {
-        let volumeInfo = '';
-        if (b.service_type === 'lashes' && b.lashes_volume) {
-            volumeInfo = `\nОбъём: ${b.lashes_volume.toUpperCase()}`;
+    async function cancelBooking(id) {
+        if (!confirm('Отменить запись?')) return;
+        await fetch(`/api/admin/cancel/${id}`, { method: 'POST' });
+        loadBookings();
+        loadCalendar();
+    }
+
+    async function deleteBooking(id) {
+        if (!confirm('Удалить запись навсегда?')) return;
+        await fetch(`/api/booking/${id}`, { method: 'DELETE' });
+        loadBookings();
+        loadCalendar();
+    }
+
+    window.toggleDayOff = async function(date) {
+        const res = await fetch(`/api/admin/toggle-day-off/${date}`, { method: 'POST' });
+        const data = await res.json();
+        if (data.warning) {
+            if (confirm(data.message + '\nУдалить записи и сделать выходным?')) {
+                await fetch(`/api/admin/confirm-day-off/${date}`, { method: 'POST' });
+            }
         }
-        alert(`Клиент: ${b.client_name}\nТелефон: ${b.client_phone}\nУслуга: ${b.service_type}${volumeInfo}\nСтатус: ${b.status}\nКомментарий: ${b.notes || 'Нет'}`);
-    });
-};
-
-async function loadPrices() {
-    const res = await fetch('/api/prices');
-    const p = await res.json();
-    document.getElementById('priceLashes_1d').value = p.lashes_1d || 2500;
-    document.getElementById('priceLashes_1.5d').value = p.lashes_1_5d || 2750;
-    document.getElementById('priceLashes_2d').value = p.lashes_2d || 3000;
-    document.getElementById('priceLashes_3d').value = p.lashes_3d || 3500;
-    document.getElementById('priceBrows').value = p.brows || 2000;
-    document.getElementById('priceComplex').value = p.complex || 3800;
-    document.getElementById('priceDeposit').value = p.deposit || 300;
-}
-
-async function savePrice(service) {
-    let priceInput = null;
-    const serviceMap = {
-        'lashes_1d': 'priceLashes_1d',
-        'lashes_1_5d': 'priceLashes_1.5d',
-        'lashes_2d': 'priceLashes_2d',
-        'lashes_3d': 'priceLashes_3d',
-        'brows': 'priceBrows',
-        'complex': 'priceComplex',
-        'deposit': 'priceDeposit'
+        await loadCalendar();
     };
 
-    priceInput = document.getElementById(serviceMap[service]);
+    window.editDayHours = function(date) {
+        window.location.href = `/admin/hours?date=${date}`;
+    };
 
-    if (!priceInput) {
-        alert('Ошибка: поле не найдено для ' + service);
+    window.showBookingDetail = function(id) {
+        fetch(`/api/admin/booking/${id}`).then(r=>r.json()).then(b => {
+            let volumeInfo = '';
+            if (b.service_type === 'lashes' && b.lashes_volume) {
+                volumeInfo = `\nОбъём: ${b.lashes_volume.toUpperCase()}`;
+            }
+            alert(`Клиент: ${b.client_name}\nТелефон: ${b.client_phone}\nУслуга: ${b.service_type}${volumeInfo}\nСтатус: ${b.status}\nКомментарий: ${b.notes || 'Нет'}`);
+        });
+    };
+
+    async function loadPrices() {
+        const res = await fetch('/api/prices');
+        const p = await res.json();
+        document.getElementById('priceLashes_1d').value = p.lashes_1d || 2500;
+        document.getElementById('priceLashes_1.5d').value = p.lashes_1_5d || 2750;
+        document.getElementById('priceLashes_2d').value = p.lashes_2d || 3000;
+        document.getElementById('priceLashes_3d').value = p.lashes_3d || 3500;
+        document.getElementById('priceBrows').value = p.brows || 2000;
+        document.getElementById('priceComplex').value = p.complex || 3800;
+        document.getElementById('priceDeposit').value = p.deposit || 300;
+    }
+
+    async function savePrice(service) {
+        let priceInput = null;
+        const serviceMap = {
+            'lashes_1d': 'priceLashes_1d',
+            'lashes_1_5d': 'priceLashes_1.5d',
+            'lashes_2d': 'priceLashes_2d',
+            'lashes_3d': 'priceLashes_3d',
+            'brows': 'priceBrows',
+            'complex': 'priceComplex',
+            'deposit': 'priceDeposit'
+        };
+
+        priceInput = document.getElementById(serviceMap[service]);
+
+        if (!priceInput) {
+            alert('Ошибка: поле не найдено для ' + service);
+            return;
+        }
+
+        const price = parseInt(priceInput.value);
+        if (isNaN(price)) {
+            alert('Введите корректную цену');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/prices/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ service: service, price: price })
+            });
+
+            if (response.ok) {
+                alert('✅ Цена сохранена');
+                loadPrices();
+            } else {
+                const error = await response.json();
+                alert('❌ Ошибка: ' + (error.detail || 'Неизвестная ошибка'));
+            }
+        } catch(e) {
+            console.error('Ошибка:', e);
+            alert('❌ Ошибка соединения');
+        }
+    }
+
+    async function loadContent() {
+        const res = await fetch('/api/content');
+        const c = await res.json();
+        document.getElementById('hero_title').value = c.hero_title || '';
+        document.getElementById('hero_text').value = c.hero_text || '';
+        document.getElementById('about').value = c.about || '';
+        document.getElementById('address').value = c.address || '';
+        document.getElementById('service_lashes_img').value = c.service_lashes_img || '';
+        document.getElementById('service_brows_img').value = c.service_brows_img || '';
+        document.getElementById('service_complex_img').value = c.service_complex_img || '';
+    }
+
+    async function saveContent() {
+        await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'hero_title', content: document.getElementById('hero_title').value }) });
+        await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'hero_text', content: document.getElementById('hero_text').value }) });
+        await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'about', content: document.getElementById('about').value }) });
+        await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'address', content: document.getElementById('address').value }) });
+        await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'service_lashes_img', content: document.getElementById('service_lashes_img').value }) });
+        await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'service_brows_img', content: document.getElementById('service_brows_img').value }) });
+        await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'service_complex_img', content: document.getElementById('service_complex_img').value }) });
+        alert('Сохранено');
+    }
+
+    async function loadGallery() {
+        const res = await fetch('/api/gallery');
+        const images = await res.json();
+        let html = '';
+        for (const img of images) {
+            const displayText = img.description || img.title || '';
+            html += `<div class="gallery-item"><img src="${img.url}" onerror="this.src='https://via.placeholder.com/150'"><p>${escapeHtml(displayText)}</p><button class="delete-img" onclick="deleteImage(${img.id})">✖</button></div>`;
+        }
+        document.getElementById('gallery-list').innerHTML = html || '<p>Нет фото</p>';
+    }
+
+    async function uploadWithDetails() {
+        const fileInput = document.getElementById('fileInput');
+        const title = document.getElementById('imageTitle').value;
+        const description = document.getElementById('imageDescription').value;
+        if (!fileInput.files || !fileInput.files.length) { alert('Выберите файл'); return; }
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        if (title) formData.append('title', title);
+        if (description) formData.append('description', description);
+        const res = await fetch('/api/gallery/upload', { method: 'POST', body: formData });
+        if (res.ok) {
+            alert('✅ Фото загружено');
+            document.getElementById('imageTitle').value = '';
+            document.getElementById('imageDescription').value = '';
+            fileInput.value = '';
+            loadGallery();
+        } else { alert('❌ Ошибка загрузки'); }
+    }
+
+    async function deleteImage(id) {
+        if (!confirm('Удалить фото?')) return;
+        await fetch(`/api/gallery/${id}`, { method: 'DELETE' });
+        loadGallery();
+    }
+
+    async function loadComments(type = 'pending') {
+        let url = type === 'approved' ? '/api/admin/comments/approved' : (type === 'all' ? '/api/comments/all' : '/api/admin/comments/pending');
+        const res = await fetch(url);
+        const comments = await res.json();
+        let html = '';
+        for (const c of comments) {
+            const stars = '★'.repeat(c.rating) + '☆'.repeat(5 - c.rating);
+            html += `<div class="comment-item" data-id="${c.id}">
+                <div class="comment-emoji">${c.emoji}</div>
+                <div class="comment-rating">${stars}</div>
+                <p><strong>${escapeHtml(c.client_name)}</strong> (${escapeHtml(c.client_phone)})</p>
+                <div class="comment-text" contenteditable="true">${escapeHtml(c.text)}</div>
+                <small>${new Date(c.created_at).toLocaleString()}</small>
+                <div style="margin-top:10px;">
+                    ${!c.is_approved ? `<button class="btn-success" onclick="approveComment(${c.id})">✅ Одобрить</button>` : ''}
+                    <button class="btn-warning" onclick="editComment(${c.id})">✏️ Редактировать</button>
+                    <button class="btn-danger" onclick="deleteComment(${c.id})">🗑️ Удалить</button>
+                </div>
+            </div>`;
+        }
+        document.getElementById('comments-list').innerHTML = html || '<p>Нет отзывов</p>';
+    }
+
+    async function editComment(id) {
+        const div = document.querySelector(`.comment-item[data-id="${id}"] .comment-text`);
+        const newText = div.innerText.trim();
+        if (!newText) return;
+        await fetch(`/api/comments/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: newText }) });
+        alert('Отзыв обновлён');
+        loadComments('all');
+    }
+
+    async function approveComment(id) {
+        await fetch(`/api/admin/comments/approve/${id}`, { method: 'POST' });
+        loadComments();
+    }
+
+    async function deleteComment(id) {
+        if (!confirm('Удалить отзыв?')) return;
+        await fetch(`/api/admin/comments/${id}`, { method: 'DELETE' });
+        loadComments();
+    }
+
+    async function loadFinance() {
+        const year = document.getElementById('financeYearSelect').value;
+        const month = document.getElementById('financeMonthSelect').value;
+        const res = await fetch(`/api/finance/month/${year}/${month}`);
+        const data = await res.json();
+        document.getElementById('financeStats').innerHTML = `
+            <div class="finance-stats">
+                <div class="finance-stat"><h3>📝 Всего записей</h3><div class="value">${data.total_bookings}</div></div>
+                <div class="finance-stat"><h3>💰 Общая выручка</h3><div class="value">${data.total_amount.toLocaleString()} ₽</div></div>
+                <div class="finance-stat"><h3>💵 Средний чек</h3><div class="value">${Math.round(data.total_amount / data.total_bookings || 0).toLocaleString()} ₽</div></div>
+            </div>
+        `;
+        let detailsHtml = '<h4 style="margin-top:20px">📋 Детали по услугам:</h4><table class="bookings-table"><thead><tr><th>Услуга</th><th>Количество</th><th>Выручка</th></tr></thead><tbody>';
+        for (const [key, service] of Object.entries(data.service_stats)) {
+            detailsHtml += `<tr><td>${service.name}</td><td>${service.count} шт</td><td>${service.total.toLocaleString()} ₽</td></tr>`;
+        }
+        if (data.volume_stats) {
+            detailsHtml += '<h4 style="margin-top:20px">📊 По объёмам ресниц:</h4><table class="bookings-table"><thead><tr><th>Объём</th><th>Количество</th><th>Выручка</th></tr></thead><tbody>';
+            for (const [key, vol] of Object.entries(data.volume_stats)) {
+                if (vol.count > 0) {
+                    detailsHtml += `<tr><td>${vol.name}</td><td>${vol.count} шт</td><td>${vol.total.toLocaleString()} ₽</td></tr>`;
+                }
+            }
+            detailsHtml += '</tbody></table>';
+        }
+        document.getElementById('financeDetails').innerHTML = detailsHtml;
+        document.getElementById('monthlyChart').innerHTML = '';
+    }
+
+    async function loadMonthlyStats() {
+        const res = await fetch('/api/finance/monthly');
+        const data = await res.json();
+        if (!data.months.length) {
+            document.getElementById('monthlyChart').innerHTML = '<p>Нет данных для отображения</p>';
+            return;
+        }
+        let html = '<h4>📈 Помесячная статистика</h4><table class="bookings-table"><thead><tr><th>Месяц</th><th>Количество записей</th><th>Выручка</th></tr></thead><tbody>';
+        for (let i = 0; i < data.months.length; i++) {
+            html += `<tr>
+                <td>${data.months[i]}</td>
+                <td>${data.counts[i]} шт</td>
+                <td>${data.revenues[i].toLocaleString()} ₽</td>
+            </tr>`;
+        }
+        html += '</tbody></table>';
+        document.getElementById('monthlyChart').innerHTML = html;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+async function uploadImageToContent(type) {
+    let fileInput = null;
+    let fieldId = null;
+
+    if (type === 'lashes') {
+        fileInput = document.getElementById('uploadLashesImg');
+        fieldId = 'service_lashes_img';
+    } else if (type === 'brows') {
+        fileInput = document.getElementById('uploadBrowsImg');
+        fieldId = 'service_brows_img';
+    } else if (type === 'complex') {
+        fileInput = document.getElementById('uploadComplexImg');
+        fieldId = 'service_complex_img';
+    }
+
+    if (!fileInput.files || !fileInput.files.length) {
+        alert('Выберите файл');
         return;
     }
 
-    const price = parseInt(priceInput.value);
-    if (isNaN(price)) {
-        alert('Введите корректную цену');
-        return;
-    }
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
 
     try {
-        const response = await fetch('/api/prices/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ service: service, price: price })
-        });
-
-        if (response.ok) {
-            alert('✅ Цена сохранена');
-            loadPrices();
+        const res = await fetch('/api/gallery/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (res.ok) {
+            // Обновляем поле URL
+            document.getElementById(fieldId).value = data.url;
+            alert('✅ Фото загружено! Не забудьте нажать "Сохранить все"');
         } else {
-            const error = await response.json();
-            alert('❌ Ошибка: ' + (error.detail || 'Неизвестная ошибка'));
+            alert('❌ Ошибка загрузки');
         }
     } catch(e) {
-        console.error('Ошибка:', e);
         alert('❌ Ошибка соединения');
     }
 }
 
-async function loadContent() {
-    const res = await fetch('/api/content');
-    const c = await res.json();
-    document.getElementById('hero_title').value = c.hero_title || '';
-    document.getElementById('hero_text').value = c.hero_text || '';
-    document.getElementById('about').value = c.about || '';
-    document.getElementById('address').value = c.address || '';
-    document.getElementById('service_lashes_img').value = c.service_lashes_img || '';
-    document.getElementById('service_brows_img').value = c.service_brows_img || '';
-    document.getElementById('service_complex_img').value = c.service_complex_img || '';
-}
-
-async function saveContent() {
-    await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'hero_title', content: document.getElementById('hero_title').value }) });
-    await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'hero_text', content: document.getElementById('hero_text').value }) });
-    await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'about', content: document.getElementById('about').value }) });
-    await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'address', content: document.getElementById('address').value }) });
-    await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'service_lashes_img', content: document.getElementById('service_lashes_img').value }) });
-    await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'service_brows_img', content: document.getElementById('service_brows_img').value }) });
-    await fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'service_complex_img', content: document.getElementById('service_complex_img').value }) });
-    alert('Сохранено');
-}
-
-async function loadGallery() {
-    const res = await fetch('/api/gallery');
-    const images = await res.json();
-    let html = '';
-    for (const img of images) {
-        const displayText = img.description || img.title || '';
-        html += `<div class="gallery-item"><img src="${img.url}" onerror="this.src='https://via.placeholder.com/150'"><p>${escapeHtml(displayText)}</p><button class="delete-img" onclick="deleteImage(${img.id})">✖</button></div>`;
-    }
-    document.getElementById('gallery-list').innerHTML = html || '<p>Нет фото</p>';
-}
-
-async function uploadWithDetails() {
-    const fileInput = document.getElementById('fileInput');
-    const title = document.getElementById('imageTitle').value;
-    const description = document.getElementById('imageDescription').value;
-    if (!fileInput.files || !fileInput.files.length) { alert('Выберите файл'); return; }
-    const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
-    if (title) formData.append('title', title);
-    if (description) formData.append('description', description);
-    const res = await fetch('/api/gallery/upload', { method: 'POST', body: formData });
-    if (res.ok) {
-        alert('✅ Фото загружено');
-        document.getElementById('imageTitle').value = '';
-        document.getElementById('imageDescription').value = '';
-        fileInput.value = '';
-        loadGallery();
-    } else { alert('❌ Ошибка загрузки'); }
-}
-
-async function deleteImage(id) {
-    if (!confirm('Удалить фото?')) return;
-    await fetch(`/api/gallery/${id}`, { method: 'DELETE' });
+    loadCalendar();
+    loadBookings();
+    loadPrices();
+    loadContent();
     loadGallery();
-}
-
-async function loadComments(type = 'pending') {
-    let url = type === 'approved' ? '/api/admin/comments/approved' : (type === 'all' ? '/api/comments/all' : '/api/admin/comments/pending');
-    const res = await fetch(url);
-    const comments = await res.json();
-    let html = '';
-    for (const c of comments) {
-        const stars = '★'.repeat(c.rating) + '☆'.repeat(5 - c.rating);
-        html += `<div class="comment-item" data-id="${c.id}">
-            <div class="comment-emoji">${c.emoji}</div>
-            <div class="comment-rating">${stars}</div>
-            <p><strong>${escapeHtml(c.client_name)}</strong> (${escapeHtml(c.client_phone)})</p>
-            <div class="comment-text" contenteditable="true">${escapeHtml(c.text)}</div>
-            <small>${new Date(c.created_at).toLocaleString()}</small>
-            <div style="margin-top:10px;">
-                ${!c.is_approved ? `<button class="btn-success" onclick="approveComment(${c.id})">✅ Одобрить</button>` : ''}
-                <button class="btn-warning" onclick="editComment(${c.id})">✏️ Редактировать</button>
-                <button class="btn-danger" onclick="deleteComment(${c.id})">🗑️ Удалить</button>
-            </div>
-        </div>`;
-    }
-    document.getElementById('comments-list').innerHTML = html || '<p>Нет отзывов</p>';
-}
-
-async function editComment(id) {
-    const div = document.querySelector(`.comment-item[data-id="${id}"] .comment-text`);
-    const newText = div.innerText.trim();
-    if (!newText) return;
-    await fetch(`/api/comments/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: newText }) });
-    alert('Отзыв обновлён');
-    loadComments('all');
-}
-
-async function approveComment(id) {
-    await fetch(`/api/admin/comments/approve/${id}`, { method: 'POST' });
-    loadComments();
-}
-
-async function deleteComment(id) {
-    if (!confirm('Удалить отзыв?')) return;
-    await fetch(`/api/admin/comments/${id}`, { method: 'DELETE' });
-    loadComments();
-}
-
-async function loadFinance() {
-    const year = document.getElementById('financeYearSelect').value;
-    const month = document.getElementById('financeMonthSelect').value;
-    const res = await fetch(`/api/finance/month/${year}/${month}`);
-    const data = await res.json();
-    document.getElementById('financeStats').innerHTML = `
-        <div class="finance-stats">
-            <div class="finance-stat"><h3>📝 Всего записей</h3><div class="value">${data.total_bookings}</div></div>
-            <div class="finance-stat"><h3>💰 Общая выручка</h3><div class="value">${data.total_amount.toLocaleString()} ₽</div></div>
-            <div class="finance-stat"><h3>💵 Средний чек</h3><div class="value">${Math.round(data.total_amount / data.total_bookings || 0).toLocaleString()} ₽</div></div>
-        </div>
-    `;
-    let detailsHtml = '<h4 style="margin-top:20px">📋 Детали по услугам:</h4><table class="bookings-table"><thead><tr><th>Услуга</th><th>Количество</th><th>Выручка</th></tr></thead><tbody>';
-    for (const [key, service] of Object.entries(data.service_stats)) {
-        detailsHtml += `<tr><td>${service.name}</td><td>${service.count} шт</td><td>${service.total.toLocaleString()} ₽</td></tr>`;
-    }
-    if (data.volume_stats) {
-        detailsHtml += '<h4 style="margin-top:20px">📊 По объёмам ресниц:</h4><table class="bookings-table"><thead><tr><th>Объём</th><th>Количество</th><th>Выручка</th></tr></thead><tbody>';
-        for (const [key, vol] of Object.entries(data.volume_stats)) {
-            if (vol.count > 0) {
-                detailsHtml += `<tr><td>${vol.name}</td><td>${vol.count} шт</td><td>${vol.total.toLocaleString()} ₽</td></tr>`;
-            }
-        }
-        detailsHtml += '</tbody></table>';
-    }
-    document.getElementById('financeDetails').innerHTML = detailsHtml;
-    document.getElementById('monthlyChart').innerHTML = '';
-}
-
-async function loadMonthlyStats() {
-    const res = await fetch('/api/finance/monthly');
-    const data = await res.json();
-    if (!data.months.length) {
-        document.getElementById('monthlyChart').innerHTML = '<p>Нет данных для отображения</p>';
-        return;
-    }
-    let html = '<h4>📈 Помесячная статистика</h4><table class="bookings-table"><thead><tr><th>Месяц</th><th>Количество записей</th><th>Выручка</th></tr></thead><tbody>';
-    for (let i = 0; i < data.months.length; i++) {
-        html += `<tr>
-            <td>${data.months[i]}</td>
-            <td>${data.counts[i]} шт</td>
-            <td>${data.revenues[i].toLocaleString()} ₽</td>
-        </tr>`;
-    }
-    html += '</tbody></table>';
-    document.getElementById('monthlyChart').innerHTML = html;
-}
-
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-loadCalendar();
-loadBookings();
-loadPrices();
-loadContent();
-loadGallery();
-loadFinance();
+    loadFinance();
 </script>
 </body>
 </html>
