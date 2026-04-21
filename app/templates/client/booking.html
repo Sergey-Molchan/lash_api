@@ -68,65 +68,31 @@
     tomorrow.setDate(tomorrow.getDate() + 1);
     document.getElementById('bookingDate').min = tomorrow.toISOString().split('T')[0];
 
-    document.getElementById('bookingForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = document.getElementById('clientName').value.trim();
-    const phone = document.getElementById('clientPhone').value.trim();
-    const service = document.getElementById('serviceType').value;
-    const lashesVolume = document.getElementById('lashesVolume').value;
-    const date = document.getElementById('bookingDate').value;
-    const comment = document.getElementById('comment').value;
-
-    if (!name || !phone) { showMessage('Заполните имя и телефон', 'error'); return; }
-    if (!date) { showMessage('Выберите дату', 'error'); return; }
-    if (!selectedTime) { showMessage('Выберите время', 'error'); return; }
-
-    const bookingDateTime = `${date}T${selectedTime}:00`;
-
-    try {
-        const res = await fetch('/api/client/book', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                client_name: name,
-                client_phone: phone,
-                service_type: service,
-                lashes_volume: service === 'lashes' ? lashesVolume : null,
-                booking_date: bookingDateTime,
-                comment: comment
-            })
-        });
-
-        const result = await res.json();
-
-        if (res.ok) {
-            let msg = `✅ Запись создана! Номер: ${result.id}`;
-            if (service === 'lashes' && lashesVolume) {
-                let priceKey = lashesVolume === '1.5d' ? 'lashes_1_5d' : `lashes_${lashesVolume}`;
-                let price = prices[priceKey];
-                if (price) msg += ` Сумма: ${price} ₽`;
+    document.getElementById('bookingDate').addEventListener('change', async function() {
+        const date = this.value;
+        if (!date) return;
+        try {
+            const res = await fetch(`/api/client/available-slots?date=${date}`);
+            const data = await res.json();
+            const slotsDiv = document.getElementById('timeSlots');
+            if (data.is_day_off) {
+                slotsDiv.innerHTML = '<div class="time-slot disabled">❌ Выходной</div>';
+                selectedTime = null;
+                return;
             }
-            showMessage(msg, 'success');
-            document.getElementById('bookingForm').reset();
-            document.getElementById('timeSlots').innerHTML = '<div class="time-slot disabled">Сначала выберите дату</div>';
+            if (!data.slots || data.slots.length === 0) {
+                slotsDiv.innerHTML = '<div class="time-slot disabled">😞 Нет свободного времени</div>';
+                selectedTime = null;
+                return;
+            }
+            let html = '';
+            for (let slot of data.slots) {
+                html += `<div class="time-slot" onclick="selectTime('${slot}')">${slot}</div>`;
+            }
+            slotsDiv.innerHTML = html;
             selectedTime = null;
-        } else {
-            // ПРАВИЛЬНАЯ ОБРАБОТКА ОШИБКИ
-            let errorMsg = 'Неизвестная ошибка';
-            if (result.detail) {
-                errorMsg = result.detail;
-            } else if (typeof result === 'string') {
-                errorMsg = result;
-            } else if (result.message) {
-                errorMsg = result.message;
-            }
-            showMessage(`❌ ${errorMsg}`, 'error');
-        }
-    } catch(e) {
-        console.error('Ошибка:', e);
-        showMessage('❌ Ошибка соединения. Проверьте интернет.', 'error');
-    }
-});
+        } catch(e) { console.error(e); }
+    });
 
     window.selectTime = function(time) {
         document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('selected'));
@@ -134,6 +100,7 @@
         selectedTime = time;
     };
 
+    // ЕДИНСТВЕННЫЙ ОБРАБОТЧИК ОТПРАВКИ
     document.getElementById('bookingForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('clientName').value.trim();
@@ -142,10 +109,13 @@
         const lashesVolume = document.getElementById('lashesVolume').value;
         const date = document.getElementById('bookingDate').value;
         const comment = document.getElementById('comment').value;
+
         if (!name || !phone) { showMessage('Заполните имя и телефон', 'error'); return; }
         if (!date) { showMessage('Выберите дату', 'error'); return; }
         if (!selectedTime) { showMessage('Выберите время', 'error'); return; }
+
         const bookingDateTime = `${date}T${selectedTime}:00`;
+
         try {
             const res = await fetch('/api/client/book', {
                 method: 'POST',
@@ -159,7 +129,9 @@
                     comment: comment
                 })
             });
+
             const result = await res.json();
+
             if (res.ok) {
                 let msg = `✅ Запись создана! Номер: ${result.id}`;
                 if (service === 'lashes' && lashesVolume) {
@@ -172,10 +144,20 @@
                 document.getElementById('timeSlots').innerHTML = '<div class="time-slot disabled">Сначала выберите дату</div>';
                 selectedTime = null;
             } else {
-                showMessage(`❌ Ошибка: ${result.detail}`, 'error');
+                // ПРАВИЛЬНАЯ ОБРАБОТКА ОШИБКИ
+                let errorMsg = 'Неизвестная ошибка';
+                if (result.detail) {
+                    errorMsg = result.detail;
+                } else if (typeof result === 'string') {
+                    errorMsg = result;
+                } else if (result.message) {
+                    errorMsg = result.message;
+                }
+                showMessage(`❌ ${errorMsg}`, 'error');
             }
         } catch(e) {
-            showMessage('❌ Ошибка соединения', 'error');
+            console.error('Ошибка:', e);
+            showMessage('❌ Ошибка соединения. Проверьте интернет.', 'error');
         }
     });
 
