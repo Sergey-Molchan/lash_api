@@ -21,7 +21,6 @@
             <option value="lashes">Наращивание ресниц (2.5 часа)</option>
         </select></div>
 
-        <!-- БЛОК ВЫБОРА ОБЪЁМА РЕСНИЦ -->
         <div class="form-group" id="lashesVolumeGroup" style="display:none;">
             <label>💎 Объём ресниц</label>
             <select id="lashesVolume">
@@ -49,14 +48,12 @@
 
     // ========== ФУНКЦИЯ ВАЛИДАЦИИ ТЕЛЕФОНА ==========
     function validatePhone(phone) {
-        // Удаляем все не-цифры
         const digitsOnly = phone.replace(/[^0-9]/g, '');
 
         if (!digitsOnly || digitsOnly.length === 0) {
             return { valid: false, message: '❌ Пожалуйста, введите номер телефона' };
         }
 
-        // Проверка длины
         if (digitsOnly.length < 10) {
             const missing = 10 - digitsOnly.length;
             const word = missing === 1 ? 'цифры' : 'цифр';
@@ -82,12 +79,10 @@
             return;
         }
 
-        // Ограничиваем 11 цифрами
         if (value.length > 11) {
             value = value.slice(0, 11);
         }
 
-        // Форматируем как +7 XXX XXX XX XX
         let formatted = '';
         if (value.length >= 1) {
             formatted = '+7';
@@ -121,20 +116,18 @@
     }
     loadPrices();
 
-    // ========== ОБРАБОТЧИКИ ==========
-    // Показываем выбор объёма только для ресниц
+    // ========== ПОКАЗЫВАЕМ ВЫБОР ОБЪЁМА ==========
     document.getElementById('serviceType').addEventListener('change', function() {
         const group = document.getElementById('lashesVolumeGroup');
         group.style.display = this.value === 'lashes' ? 'block' : 'none';
     });
 
-    // Форматирование телефона при вводе
+    // ========== ФОРМАТИРОВАНИЕ ТЕЛЕФОНА ==========
     const phoneInput = document.getElementById('clientPhone');
     phoneInput.addEventListener('input', function() {
         formatPhone(this);
     });
 
-    // Валидация телефона при потере фокуса
     phoneInput.addEventListener('blur', function() {
         const validation = validatePhone(this.value);
         if (!validation.valid && this.value.trim() !== '') {
@@ -142,40 +135,59 @@
         }
     });
 
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    document.getElementById('bookingDate').min = tomorrow.toISOString().split('T')[0];
+    // ========== УСТАНОВКА МИНИМАЛЬНОЙ ДАТЫ ==========
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const minDate = `${year}-${month}-${day}`;
+    document.getElementById('bookingDate').min = minDate;
 
+    // ========== ЗАГРУЗКА ДОСТУПНЫХ СЛОТОВ ==========
     document.getElementById('bookingDate').addEventListener('change', async function() {
         const date = this.value;
         if (!date) return;
+
+        console.log('Выбрана дата:', date);
+
         try {
             const res = await fetch(`/api/client/available-slots?date=${date}`);
             const data = await res.json();
+            console.log('Ответ от сервера:', data);
+
             const slotsDiv = document.getElementById('timeSlots');
+
             if (data.is_day_off) {
                 slotsDiv.innerHTML = '<div class="time-slot disabled">❌ Выходной</div>';
                 selectedTime = null;
                 return;
             }
+
             if (!data.slots || data.slots.length === 0) {
-                slotsDiv.innerHTML = '<div class="time-slot disabled">😞 Нет свободного времени</div>';
+                slotsDiv.innerHTML = '<div class="time-slot disabled">😞 Нет свободного времени на эту дату</div>';
                 selectedTime = null;
                 return;
             }
+
             let html = '';
             for (let slot of data.slots) {
                 html += `<div class="time-slot" onclick="selectTime('${slot}')">${slot}</div>`;
             }
             slotsDiv.innerHTML = html;
             selectedTime = null;
-        } catch(e) { console.error(e); }
+
+        } catch(e) {
+            console.error('Ошибка загрузки слотов:', e);
+            document.getElementById('timeSlots').innerHTML = '<div class="time-slot disabled">❌ Ошибка загрузки. Попробуйте еще раз.</div>';
+        }
     });
 
     window.selectTime = function(time) {
         document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('selected'));
         event.target.classList.add('selected');
         selectedTime = time;
+        console.log('Выбрано время:', selectedTime);
     };
 
     // ========== ОТПРАВКА ФОРМЫ ==========
@@ -189,13 +201,11 @@
         const date = document.getElementById('bookingDate').value;
         const comment = document.getElementById('comment').value;
 
-        // Валидация имени
         if (!name) {
             showMessage('❌ Пожалуйста, введите ваше имя', 'error');
             return;
         }
 
-        // Валидация телефона
         const phoneValidation = validatePhone(phone);
         if (!phoneValidation.valid) {
             showMessage(phoneValidation.message, 'error');
@@ -213,6 +223,7 @@
         }
 
         const bookingDateTime = `${date}T${selectedTime}:00`;
+        console.log('Отправка:', {name, phone, service, bookingDateTime});
 
         const requestBody = {
             client_name: name,
