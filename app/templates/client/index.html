@@ -189,28 +189,16 @@
         document.getElementById('submitReviewBtn').addEventListener('click', submitReview);
     });
 
-    // Функция с принудительным отключением кэша
-    async function fetchNoCache(url) {
-        const response = await fetch(url, {
-            cache: 'no-store',
-            headers: {
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-                'Expires': '0'
-            }
-        });
-        return response;
-    }
-
     async function loadPricesAndImages() {
         const maxRetries = 3;
         let retries = 0;
 
         async function fetchData() {
             try {
+                // Используем относительные пути — они автоматически используют HTTPS
                 const [pricesRes, homeImagesRes] = await Promise.all([
-                    fetchNoCache('/api/prices'),
-                    fetchNoCache('/api/home-images/')
+                    fetch('/api/prices'),
+                    fetch('/api/home-images/')
                 ]);
 
                 if (!pricesRes.ok || !homeImagesRes.ok) {
@@ -250,27 +238,24 @@
                     </div>
                 `;
                 console.log('✅ Данные загружены успешно');
-                return true;
             } catch (error) {
                 console.error(`Ошибка загрузки (попытка ${retries + 1}/${maxRetries}):`, error);
                 if (retries < maxRetries - 1) {
                     retries++;
                     setTimeout(fetchData, 2000);
-                    return false;
                 } else {
                     document.getElementById('servicesGrid').innerHTML = '<p style="text-align:center; grid-column:1/-1;">⚠️ Ошибка загрузки услуг. Пожалуйста, обновите страницу.</p>';
-                    return false;
                 }
             }
         }
 
         document.getElementById('servicesGrid').innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-        return await fetchData();
+        await fetchData();
     }
 
     async function loadReviews() {
         try {
-            const res = await fetchNoCache('/api/comments/approved');
+            const res = await fetch('/api/comments/approved');
             if (!res.ok) throw new Error('Ошибка загрузки отзывов');
             const reviews = await res.json();
             let html = '';
@@ -334,7 +319,7 @@
 
     async function loadContent() {
         try {
-            const res = await fetchNoCache('/api/content');
+            const res = await fetch('/api/content');
             if (!res.ok) throw new Error('Ошибка загрузки контента');
             const c = await res.json();
             document.getElementById('heroTitle').innerText = c.hero_title || '✨ Идеальный взгляд начинается здесь';
@@ -353,11 +338,11 @@
         return div.innerHTML;
     }
 
-    // Загружаем всё с приоритетом
-    window.addEventListener('load', async function() {
-        await loadPricesAndImages();
-        await loadReviews();
-        await loadContent();
+    // Загружаем всё после полной загрузки страницы
+    window.addEventListener('load', function() {
+        loadPricesAndImages();
+        loadReviews();
+        loadContent();
     });
 </script>
 </body>
