@@ -24,7 +24,7 @@
         .section-title{text-align:center;font-size:38px;margin-bottom:55px}
         .services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:35px}
         .service-card{background:white;border-radius:24px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.08)}
-        .service-img{height:260px;background-size:cover}
+        .service-img{height:260px;background-size:cover;background-position:center}
         .service-content{padding:24px}
         .price{color:#e94560;font-size:28px;font-weight:700}
         .contact{padding:80px 0}
@@ -50,67 +50,28 @@
         .footer{background:#1a1a2e;color:white;padding:40px 0;text-align:center}
         .taxi-btn{display:inline-block;background:#ff9800;color:white;padding:12px 30px;border-radius:50px;text-decoration:none;font-weight:600;margin-top:20px;margin-right:10px}
         .call-btn{display:inline-block;background:#4caf50;color:white;padding:12px 30px;border-radius:50px;text-decoration:none;font-weight:600;margin-top:20px}
-
-        .loading-spinner {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-            grid-column: 1/-1;
-        }
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #e94560;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 32px; }
-            .contact-grid { grid-template-columns: 1fr; }
-            .header-inner { flex-direction: column; gap: 15px; }
-            .nav { display: flex !important; gap: 20px; justify-content: center; flex-wrap: wrap; }
-            .nav a { font-size: 14px; }
-            .btn-book { padding: 8px 20px; }
-            .hero { padding: 200px 0 80px; }
-            .services-grid { grid-template-columns: 1fr; }
-            .section-title { font-size: 28px; }
-            .service-img { height: 200px; }
-            .review-card { padding: 15px; }
-            .add-review { padding: 20px; }
-            .emoji-option { font-size: 20px; }
-            .taxi-btn, .call-btn { padding: 8px 20px; font-size: 14px; }
-            .footer p { font-size: 12px; }
-        }
-
-        .emoji-option.selected { background: #e94560; color: white; }
+        .loading-spinner{display:flex;justify-content:center;align-items:center;padding:40px;grid-column:1/-1}
+        .spinner{width:50px;height:50px;border:4px solid #f3f3f3;border-top:4px solid #e94560;border-radius:50%;animation:spin 1s linear infinite}
+        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        @media (max-width:768px){.hero h1{font-size:32px}.contact-grid{grid-template-columns:1fr}.header-inner{flex-direction:column;gap:15px}.nav{display:flex !important;gap:20px;justify-content:center;flex-wrap:wrap}.nav a{font-size:14px}.btn-book{padding:8px 20px}.hero{padding:200px 0 80px}.services-grid{grid-template-columns:1fr}.section-title{font-size:28px}.service-img{height:200px}.review-card{padding:15px}.add-review{padding:20px}.emoji-option{font-size:20px}.taxi-btn,.call-btn{padding:8px 20px;font-size:14px}.footer p{font-size:12px}}
+        .emoji-option.selected{background:#e94560;color:white}
     </style>
 </head>
 <body>
 <header class="header">
     <div class="container header-inner">
         <div class="logo">Lash <span>Studio</span></div>
-        <div class="nav"><a href="#services">Услуги</a><a href="/portfolio">Портфолио</a><a href="#contact">Контакты</a><a
-                href="/booking" class="btn-book">Записаться</a></div>
+        <div class="nav"><a href="#services">Услуги</a><a href="/portfolio">Портфолио</a><a href="#contact">Контакты</a><a href="/booking" class="btn-book">Записаться</a></div>
     </div>
 </header>
 <section class="hero">
     <div class="container"><h1 id="heroTitle">✨ Идеальный взгляд начинается здесь</h1>
-        <p id="heroText">Наращивание ресниц и ламинирование бровей в Адлере</p><a href="/booking" class="hero-btn">Записаться
-            сейчас</a></div>
+        <p id="heroText">Наращивание ресниц и ламинирование бровей в Адлере</p><a href="/booking" class="hero-btn">Записаться сейчас</a></div>
 </section>
 <section id="services" class="services">
     <div class="container"><h2 class="section-title">Наши услуги</h2>
         <div id="servicesGrid" class="services-grid">
-            <div class="loading-spinner">
-                <div class="spinner"></div>
-            </div>
+            <div class="loading-spinner"><div class="spinner"></div></div>
         </div>
     </div>
 </section>
@@ -118,18 +79,9 @@
     <div class="container"><h2 class="section-title">Отзывы клиентов</h2>
         <div id="reviewsList"></div>
         <div class="add-review"><h3>💬 Оставить отзыв</h3>
-            <div class="rating-stars" id="ratingStars"><span class="rating-star" data-rating="1">☆</span><span
-                    class="rating-star" data-rating="2">☆</span><span class="rating-star" data-rating="3">☆</span><span
-                    class="rating-star" data-rating="4">☆</span><span class="rating-star" data-rating="5">☆</span></div>
-            <input type="text" id="reviewName" placeholder="Ваше имя"><input type="tel" id="reviewPhone"
-                                                                             placeholder="Телефон">
-            <div class="emoji-selector" id="emojiSelector"><span class="emoji-option">😊</span><span
-                    class="emoji-option">😍</span><span class="emoji-option">🥰</span><span
-                    class="emoji-option">😘</span><span class="emoji-option">👍</span><span
-                    class="emoji-option">🔥</span><span class="emoji-option">💖</span><span
-                    class="emoji-option">✨</span><span class="emoji-option">💯</span><span
-                    class="emoji-option">😎</span><span class="emoji-option">🤩</span><span class="emoji-option">💪</span>
-            </div>
+            <div class="rating-stars" id="ratingStars"><span class="rating-star" data-rating="1">☆</span><span class="rating-star" data-rating="2">☆</span><span class="rating-star" data-rating="3">☆</span><span class="rating-star" data-rating="4">☆</span><span class="rating-star" data-rating="5">☆</span></div>
+            <input type="text" id="reviewName" placeholder="Ваше имя"><input type="tel" id="reviewPhone" placeholder="Телефон">
+            <div class="emoji-selector" id="emojiSelector"><span class="emoji-option">😊</span><span class="emoji-option">😍</span><span class="emoji-option">🥰</span><span class="emoji-option">😘</span><span class="emoji-option">👍</span><span class="emoji-option">🔥</span><span class="emoji-option">💖</span><span class="emoji-option">✨</span><span class="emoji-option">💯</span><span class="emoji-option">😎</span><span class="emoji-option">🤩</span><span class="emoji-option">💪</span></div>
             <textarea id="reviewText" rows="4" placeholder="Ваш отзыв..."></textarea>
             <button id="submitReviewBtn">Отправить отзыв</button>
         </div>
@@ -140,31 +92,27 @@
         <div class="contact-grid">
             <div><h3>Как нас найти</h3>
                 <p id="address">📍 улица Голубые Дали, 78, жилой район Адлер, Сочи, Краснодарский край, 354382</p>
-                <p id="phone">📞 +7 (928) 960-19-62</p><a
-                        href="https://yandex.ru/maps/239/sochi/house/ulitsa_golubyye_dali_78/Z0AYfwZhSUcCQFppfXh0c3lrYQ==/?ll=39.911025%2C43.452585&z=16.9"
-                        class="taxi-btn" target="_blank" style="background:#2196f3">🗺️ Открыть карту</a><a
-                        href="https://taxi.yandex.ru/ru_ru/" class="taxi-btn" target="_blank">🚕 Вызвать такси</a><a
-                        href="tel:+79289601962" class="call-btn" target="_blank">📞 Позвонить</a></div>
-            <div class="map-container">
-                <iframe src="https://yandex.ru/map-widget/v1/?pt=39.911025,43.452585&z=17&l=map" width="100%"
-                        height="100%" frameborder="0"></iframe>
-            </div>
+                <p id="phone">📞 +7 (928) 960-19-62</p><a href="https://yandex.ru/maps/239/sochi/house/ulitsa_golubyye_dali_78/Z0AYfwZhSUcCQFppfXh0c3lrYQ==/?ll=39.911025%2C43.452585&z=16.9" class="taxi-btn" target="_blank" style="background:#2196f3">🗺️ Открыть карту</a><a href="https://taxi.yandex.ru/ru_ru/" class="taxi-btn" target="_blank">🚕 Вызвать такси</a><a href="tel:+79289601962" class="call-btn" target="_blank">📞 Позвонить</a></div>
+            <div class="map-container"><iframe src="https://yandex.ru/map-widget/v1/?pt=39.911025,43.452585&z=17&l=map" width="100%" height="100%" frameborder="0"></iframe></div>
         </div>
     </div>
 </section>
 <footer class="footer">
     <div class="container">
         <p>© 2026 Lash Studio. Все права защищены.</p>
-        <p style="margin-top: 10px;">
-            <a href="/add-to-home" style="color: #e94560; text-decoration: none;">📱 Добавить на экран «Домой»</a>
-        </p>
+        <p style="margin-top:10px"><a href="/add-to-home" style="color:#e94560;text-decoration:none">📱 Добавить на экран «Домой»</a></p>
     </div>
 </footer>
+
+<!-- Preload скрипт -->
+<script src="/static/js/preload.js"></script>
+
 <script>
     let selectedRating = 5;
     let selectedEmoji = '😊';
 
-    document.addEventListener('DOMContentLoaded', function() {
+    // Функции для отзывов
+    function initReviews() {
         const stars = document.querySelectorAll('.rating-star');
         function updateStars(rating) {
             stars.forEach((star, idx) => {
@@ -190,95 +138,6 @@
         if (emojis.length) emojis[0].classList.add('selected');
 
         document.getElementById('submitReviewBtn').addEventListener('click', submitReview);
-    });
-
-    // Функция с правильными относительными путями
-    async function loadPricesAndImages() {
-        const maxRetries = 3;
-        let retries = 0;
-
-        async function fetchData() {
-            try {
-                // ИСПРАВЛЕНО: Используем ТОЛЬКО относительные пути
-                const [pricesRes, homeImagesRes] = await Promise.all([
-                    fetch('/api/prices'),
-                    fetch('/api/home-images/')
-                ]);
-
-                if (!pricesRes.ok || !homeImagesRes.ok) {
-                    throw new Error(`Ошибка HTTP: prices=${pricesRes.status}, homeImages=${homeImagesRes.status}`);
-                }
-
-                const p = await pricesRes.json();
-                const homeImages = await homeImagesRes.json();
-
-                const lashesPrices = [p.lashes_1d, p.lashes_1_5d, p.lashes_2d, p.lashes_3d].filter(v => v);
-                const minLashesPrice = lashesPrices.length ? Math.min(...lashesPrices) : 2500;
-
-                document.getElementById('servicesGrid').innerHTML = `
-                    <div class="service-card">
-                        <div class="service-img" style="background-image: url('${homeImages.lashes || 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=400'}')"></div>
-                        <div class="service-content">
-                            <h3>Наращивание ресниц</h3>
-                            <div class="price">от ${minLashesPrice} ₽</div>
-                            <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
-                        </div>
-                    </div>
-                    <div class="service-card">
-                        <div class="service-img" style="background-image: url('${homeImages.brows || 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400'}')"></div>
-                        <div class="service-content">
-                            <h3>Ламинирование бровей</h3>
-                            <div class="price">от ${p.brows} ₽</div>
-                            <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
-                        </div>
-                    </div>
-                    <div class="service-card">
-                        <div class="service-img" style="background-image: url('${homeImages.complex || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400'}')"></div>
-                        <div class="service-content">
-                            <h3>Комплекс: Ресницы + Брови</h3>
-                            <div class="price">${p.complex} ₽</div>
-                            <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
-                        </div>
-                    </div>
-                `;
-                console.log('✅ Данные загружены успешно');
-            } catch (error) {
-                console.error(`Ошибка загрузки (попытка ${retries + 1}/${maxRetries}):`, error);
-                if (retries < maxRetries - 1) {
-                    retries++;
-                    setTimeout(fetchData, 2000);
-                } else {
-                    document.getElementById('servicesGrid').innerHTML = '<p style="text-align:center; grid-column:1/-1;">⚠️ Ошибка загрузки услуг. Пожалуйста, обновите страницу.</p>';
-                }
-            }
-        }
-
-        document.getElementById('servicesGrid').innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-        await fetchData();
-    }
-
-    async function loadReviews() {
-        try {
-            const res = await fetch('/api/comments/approved');
-            if (!res.ok) throw new Error('Ошибка загрузки отзывов');
-            const reviews = await res.json();
-            let html = '';
-            for (const r of reviews) {
-                const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
-                html += `
-                    <div class="review-card">
-                        <div class="review-emoji">${r.emoji}</div>
-                        <div class="review-rating">${stars}</div>
-                        <div class="review-text">${escapeHtml(r.text)}</div>
-                        <div class="review-author">— ${escapeHtml(r.client_name)}</div>
-                    </div>
-                `;
-            }
-            document.getElementById('reviewsList').innerHTML = html || '<p>Пока нет отзывов. Будьте первым!</p>';
-        } catch (error) {
-            console.error('Ошибка загрузки отзывов:', error);
-            document.getElementById('reviewsList').innerHTML = '<p>Ошибка загрузки отзывов. Пожалуйста, обновите страницу.</p>';
-        }
     }
 
     async function submitReview() {
@@ -321,9 +180,90 @@
         }
     }
 
+    async function loadReviews() {
+        try {
+            const res = await fetch('/api/comments/approved', { cache: 'no-cache' });
+            if (!res.ok) throw new Error('Ошибка загрузки отзывов');
+            const reviews = await res.json();
+            let html = '';
+            for (const r of reviews) {
+                const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+                html += `<div class="review-card"><div class="review-emoji">${r.emoji}</div><div class="review-rating">${stars}</div><div class="review-text">${escapeHtml(r.text)}</div><div class="review-author">— ${escapeHtml(r.client_name)}</div></div>`;
+            }
+            document.getElementById('reviewsList').innerHTML = html || '<p>Пока нет отзывов. Будьте первым!</p>';
+        } catch (error) {
+            console.error('Ошибка загрузки отзывов:', error);
+            document.getElementById('reviewsList').innerHTML = '<p>Ошибка загрузки отзывов. Пожалуйста, обновите страницу.</p>';
+        }
+    }
+
+    // ОСНОВНАЯ ФУНКЦИЯ ЗАГРУЗКИ УСЛУГ
+    async function loadPricesAndImages() {
+        const maxRetries = 3;
+        let retries = 0;
+
+        async function fetchData() {
+            try {
+                const [pricesRes, homeImagesRes] = await Promise.all([
+                    fetch('/api/prices', { cache: 'no-cache' }),
+                    fetch('/api/home-images/', { cache: 'no-cache' })
+                ]);
+
+                if (!pricesRes.ok || !homeImagesRes.ok) {
+                    throw new Error(`Ошибка HTTP: prices=${pricesRes.status}, homeImages=${homeImagesRes.status}`);
+                }
+
+                const p = await pricesRes.json();
+                const homeImages = await homeImagesRes.json();
+
+                const lashesPrices = [p.lashes_1d, p.lashes_1_5d, p.lashes_2d, p.lashes_3d].filter(v => v);
+                const minLashesPrice = lashesPrices.length ? Math.min(...lashesPrices) : 2500;
+
+                document.getElementById('servicesGrid').innerHTML = `
+                    <div class="service-card">
+                        <div class="service-img" style="background-image: url('${homeImages.lashes || 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=400'}')"></div>
+                        <div class="service-content">
+                            <h3>Наращивание ресниц</h3>
+                            <div class="price">от ${minLashesPrice} ₽</div>
+                            <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
+                        </div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-img" style="background-image: url('${homeImages.brows || 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400'}')"></div>
+                        <div class="service-content">
+                            <h3>Ламинирование бровей</h3>
+                            <div class="price">от ${p.brows} ₽</div>
+                            <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
+                        </div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-img" style="background-image: url('${homeImages.complex || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400'}')"></div>
+                        <div class="service-content">
+                            <h3>Комплекс: Ресницы + Брови</h3>
+                            <div class="price">${p.complex} ₽</div>
+                            <a href="/booking" style="color:#e94560;text-decoration:none;">Записаться →</a>
+                        </div>
+                    </div>
+                `;
+                console.log('✅ Услуги загружены успешно');
+            } catch (error) {
+                console.error(`Ошибка загрузки (попытка ${retries + 1}/${maxRetries}):`, error);
+                if (retries < maxRetries - 1) {
+                    retries++;
+                    setTimeout(fetchData, 2000);
+                } else {
+                    document.getElementById('servicesGrid').innerHTML = '<p style="text-align:center; grid-column:1/-1;">⚠️ Ошибка загрузки услуг. Пожалуйста, обновите страницу.</p>';
+                }
+            }
+        }
+
+        document.getElementById('servicesGrid').innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        await fetchData();
+    }
+
     async function loadContent() {
         try {
-            const res = await fetch('/api/content');
+            const res = await fetch('/api/content', { cache: 'no-cache' });
             if (!res.ok) throw new Error('Ошибка загрузки контента');
             const c = await res.json();
             document.getElementById('heroTitle').innerText = c.hero_title || '✨ Идеальный взгляд начинается здесь';
@@ -342,8 +282,17 @@
         return div.innerHTML;
     }
 
-    // Загружаем всё после полной загрузки страницы
-    window.addEventListener('load', function() {
+    // ЗАПУСК ВСЕГО
+    document.addEventListener('DOMContentLoaded', function() {
+        initReviews();
+        loadPricesAndImages();
+        loadReviews();
+        loadContent();
+    });
+
+    // Повторная попытка после предзагрузки
+    window.addEventListener('apiPreloaded', function() {
+        console.log('🔄 Повторная загрузка после preload');
         loadPricesAndImages();
         loadReviews();
         loadContent();

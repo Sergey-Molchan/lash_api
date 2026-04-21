@@ -2,6 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Портфолио - Lash Studio</title>
     <style>
@@ -80,14 +83,31 @@
             font-size: 40px;
             cursor: pointer;
         }
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            grid-column: 1/-1;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #e94560;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         .footer {
             background: #1a1a2e;
             color: white;
             padding: 30px 0;
             text-align: center;
         }
-
-        /* ===== АДАПТИВ ДЛЯ ТЕЛЕФОНОВ ===== */
         @media (max-width: 768px) {
             .header-inner { flex-direction: column; gap: 15px; }
             .nav { gap: 20px; justify-content: center; }
@@ -105,69 +125,110 @@
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="container header-inner">
-            <div class="logo">Lash <span>Studio</span></div>
-            <div class="nav">
-                <a href="/">Главная</a>
-                <a href="/portfolio" style="color:#e94560;">Портфолио</a>
-                <a href="/booking" class="btn-book">Записаться</a>
+<header class="header">
+    <div class="container header-inner">
+        <div class="logo">Lash <span>Studio</span></div>
+        <div class="nav">
+            <a href="/">Главная</a>
+            <a href="/portfolio" style="color:#e94560;">Портфолио</a>
+            <a href="/booking" class="btn-book">Записаться</a>
+        </div>
+    </div>
+</header>
+
+<section class="portfolio-section">
+    <div class="container">
+        <h2 class="section-title">Наши работы</h2>
+        <div class="gallery-grid" id="galleryGrid">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
             </div>
         </div>
-    </header>
-
-    <section class="portfolio-section">
-        <div class="container">
-            <h2 class="section-title">Наши работы</h2>
-            <div class="gallery-grid" id="galleryGrid"></div>
-        </div>
-    </section>
-
-    <div class="modal" id="imageModal" onclick="closeModal()">
-        <span class="close-modal">&times;</span>
-        <img id="modalImage" src="">
     </div>
+</section>
 
-    <footer class="footer">
-        <div class="container">
-            <p>© 2026 Lash Studio. Все права защищены.</p>
-        </div>
-    </footer>
+<div class="modal" id="imageModal" onclick="closeModal()">
+    <span class="close-modal">&times;</span>
+    <img id="modalImage" src="">
+</div>
 
-    <script>
-        async function loadGallery() {
-            const res = await fetch('/api/gallery');
-            const images = await res.json();
-            let html = '';
-            for (const img of images) {
-                const displayText = img.description || img.title || '';
-                html += `
-                    <div class="gallery-item" onclick="openModal('${img.url}')">
-                        <img src="${img.url}" onerror="this.src='https://via.placeholder.com/300?text=No+Image'">
-                        <p>${escapeHtml(displayText)}</p>
-                    </div>
-                `;
+<footer class="footer">
+    <div class="container">
+        <p>© 2026 Lash Studio. Все права защищены.</p>
+    </div>
+</footer>
+
+<script src="/static/js/preload.js"></script>
+
+<script>
+    async function loadGallery() {
+        const maxRetries = 3;
+        let retries = 0;
+
+        async function fetchGallery() {
+            try {
+                const res = await fetch('/api/gallery', {
+                    cache: 'no-cache',
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                const images = await res.json();
+
+                if (!images || images.length === 0) {
+                    document.getElementById('galleryGrid').innerHTML = '<p style="text-align:center; grid-column:1/-1;">Фотографии скоро появятся</p>';
+                    return;
+                }
+
+                let html = '';
+                for (const img of images) {
+                    const imageUrl = img.url || img.image_url;
+                    const displayText = img.description || img.title || '';
+                    html += `
+                        <div class="gallery-item" onclick="openModal('${imageUrl}')">
+                            <img src="${imageUrl}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=No+Image'">
+                            <p>${escapeHtml(displayText)}</p>
+                        </div>
+                    `;
+                }
+                document.getElementById('galleryGrid').innerHTML = html;
+                console.log('✅ Портфолио загружено, фото:', images.length);
+            } catch (error) {
+                console.error(`Ошибка (попытка ${retries + 1}/${maxRetries}):`, error);
+                if (retries < maxRetries - 1) {
+                    retries++;
+                    setTimeout(fetchGallery, 2000);
+                } else {
+                    document.getElementById('galleryGrid').innerHTML = '<p style="text-align:center; grid-column:1/-1;">⚠️ Ошибка загрузки фотографий. Пожалуйста, обновите страницу.</p>';
+                }
             }
-            document.getElementById('galleryGrid').innerHTML = html || '<p style="text-align:center; grid-column:1/-1;">Фотографии скоро появятся</p>';
         }
 
-        function openModal(url) {
-            document.getElementById('modalImage').src = url;
-            document.getElementById('imageModal').style.display = 'flex';
-        }
+        await fetchGallery();
+    }
 
-        function closeModal() {
-            document.getElementById('imageModal').style.display = 'none';
-        }
+    function openModal(url) {
+        document.getElementById('modalImage').src = url;
+        document.getElementById('imageModal').style.display = 'flex';
+    }
 
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+    function closeModal() {
+        document.getElementById('imageModal').style.display = 'none';
+    }
 
-        loadGallery();
-    </script>
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Загрузка при открытии страницы
+    document.addEventListener('DOMContentLoaded', loadGallery);
+
+    // Повторная загрузка после предзагрузки
+    window.addEventListener('apiPreloaded', loadGallery);
+</script>
 </body>
 </html>
