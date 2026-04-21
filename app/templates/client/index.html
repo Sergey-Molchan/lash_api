@@ -149,24 +149,24 @@
 
     async function loadPricesAndImages() {
         try {
-            const [pricesRes, contentRes] = await Promise.all([
+            const [pricesRes, homeImagesRes] = await Promise.all([
                 fetch('/api/prices'),
-                fetch('/api/content')
+                fetch('/api/home-images/')
             ]);
 
-            if (!pricesRes.ok || !contentRes.ok) {
+            if (!pricesRes.ok || !homeImagesRes.ok) {
                 throw new Error('Ошибка загрузки данных');
             }
 
             const p = await pricesRes.json();
-            const c = await contentRes.json();
+            const homeImages = await homeImagesRes.json();
 
             const lashesPrices = [p.lashes_1d, p.lashes_1_5d, p.lashes_2d, p.lashes_3d].filter(v => v);
             const minLashesPrice = lashesPrices.length ? Math.min(...lashesPrices) : 2500;
 
             document.getElementById('servicesGrid').innerHTML = `
                 <div class="service-card">
-                    <div class="service-img" style="background-image: url('${c.service_lashes_img || 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=400'}')"></div>
+                    <div class="service-img" style="background-image: url('${homeImages.lashes || 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=400'}')"></div>
                     <div class="service-content">
                         <h3>Наращивание ресниц</h3>
                         <div class="price">от ${minLashesPrice} ₽</div>
@@ -174,7 +174,7 @@
                     </div>
                 </div>
                 <div class="service-card">
-                    <div class="service-img" style="background-image: url('${c.service_brows_img || 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400'}')"></div>
+                    <div class="service-img" style="background-image: url('${homeImages.brows || 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400'}')"></div>
                     <div class="service-content">
                         <h3>Ламинирование бровей</h3>
                         <div class="price">от ${p.brows} ₽</div>
@@ -182,7 +182,7 @@
                     </div>
                 </div>
                 <div class="service-card">
-                    <div class="service-img" style="background-image: url('${c.service_complex_img || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400'}')"></div>
+                    <div class="service-img" style="background-image: url('${homeImages.complex || 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400'}')"></div>
                     <div class="service-content">
                         <h3>Комплекс: Ресницы + Брови</h3>
                         <div class="price">${p.complex} ₽</div>
