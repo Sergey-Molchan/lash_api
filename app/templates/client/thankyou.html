@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Спасибо за запись - Lash Studio</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:40px 20px}
+        .container{max-width:600px;margin:0 auto;background:white;border-radius:25px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center}
+        .heart{font-size:48px;margin-bottom:20px}
+        h1{color:#1a1a2e;margin-bottom:15px;font-size:28px}
+        .message{color:#4caf50;font-size:18px;margin-bottom:20px;padding:15px;background:#e8f5e9;border-radius:15px}
+        .details{text-align:left;background:#f8f9fa;border-radius:15px;padding:20px;margin:20px 0}
+        .detail-item{margin-bottom:12px;font-size:16px}
+        .detail-label{font-weight:600;color:#555;width:100px;display:inline-block}
+        .detail-value{color:#1a1a2e}
+        .phone{font-size:20px;font-weight:bold;color:#e94560;margin:15px 0}
+        .signature{font-size:18px;color:#667eea;margin-top:20px;font-style:italic}
+        .btn-home{display:inline-block;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;text-decoration:none;padding:12px 30px;border-radius:40px;font-weight:600;margin-top:25px;transition:transform 0.2s}
+        .btn-home:hover{transform:scale(1.02)}
+        .footer{margin-top:25px;font-size:12px;color:#999}
+        .redirect-info{font-size:13px;color:#666;margin-top:15px}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="heart">❤️</div>
+        <h1>Спасибо за запись!</h1>
+        <div class="message">Ваша заявка принята</div>
+
+        <div class="details">
+            <div class="detail-item">
+                <span class="detail-label">👤 Имя:</span>
+                <span class="detail-value" id="clientName"></span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">📅 Дата:</span>
+                <span class="detail-value" id="bookingDate"></span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">⏰ Время:</span>
+                <span class="detail-value" id="bookingTime"></span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">💇 Услуга:</span>
+                <span class="detail-value" id="serviceType"></span>
+            </div>
+            <div class="detail-item" id="volumeRow" style="display:none;">
+                <span class="detail-label">💎 Объём:</span>
+                <span class="detail-value" id="lashesVolume"></span>
+            </div>
+        </div>
+
+        <div class="phone">
+            📞 По всем вопросам: <strong>+7 (928) 960-19-62</strong>
+        </div>
+
+        <div class="signature">
+            С нетерпением буду вас ждать,<br>Александра ❤️
+        </div>
+
+        <a href="/" class="btn-home">🏠 На главную</a>
+        <div class="redirect-info">
+            Перенаправление через <span id="countdown">5</span> секунд...
+        </div>
+        <div class="footer">
+            Lash Studio — Наращивание ресниц и ламинирование бровей в Адлере
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name') || 'гость';
+        const date = urlParams.get('date') || '';
+        const time = urlParams.get('time') || '';
+        const service = urlParams.get('service') || '';
+        const volume = urlParams.get('volume') || '';
+
+        let formattedDate = '';
+        if (date) {
+            const dateObj = new Date(date);
+            formattedDate = dateObj.toLocaleDateString('ru-RU', {
+                day: 'numeric', month: 'long', year: 'numeric'
+            });
+        }
+
+        document.getElementById('clientName').innerText = name;
+        document.getElementById('bookingDate').innerText = formattedDate || date;
+        document.getElementById('bookingTime').innerText = time;
+
+        let serviceText = '';
+        if (service === 'lashes') serviceText = 'Наращивание ресниц';
+        else if (service === 'brows') serviceText = 'Ламинирование бровей';
+        else if (service === 'complex') serviceText = 'Комплекс (ресницы+брови)';
+        document.getElementById('serviceType').innerText = serviceText;
+
+        if (volume && service === 'lashes') {
+            document.getElementById('volumeRow').style.display = 'flex';
+            document.getElementById('lashesVolume').innerText = volume.toUpperCase();
+        }
+
+        let seconds = 5;
+        const countdownEl = document.getElementById('countdown');
+        const interval = setInterval(() => {
+            seconds--;
+            countdownEl.innerText = seconds;
+            if (seconds <= 0) {
+                clearInterval(interval);
+                window.location.href = '/';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

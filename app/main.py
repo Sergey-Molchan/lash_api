@@ -75,3 +75,8 @@ async def health():
 @app.get("/add-to-home", response_class=HTMLResponse)
 async def add_to_home_page():
     return read_html("app/templates/add-to-home.html")
+
+
+@app.get("/thankyou", response_class=HTMLResponse)
+async def thankyou_page():
+    return read_html("app/templates/client/thankyou.html")

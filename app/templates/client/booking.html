@@ -100,7 +100,6 @@
         selectedTime = time;
     };
 
-    // ЕДИНСТВЕННЫЙ ОБРАБОТЧИК ОТПРАВКИ
     document.getElementById('bookingForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('clientName').value.trim();
@@ -133,18 +132,16 @@
             const result = await res.json();
 
             if (res.ok) {
-                let msg = `✅ Запись создана! Номер: ${result.id}`;
-                if (service === 'lashes' && lashesVolume) {
-                    let priceKey = lashesVolume === '1.5d' ? 'lashes_1_5d' : `lashes_${lashesVolume}`;
-                    let price = prices[priceKey];
-                    if (price) msg += ` Сумма: ${price} ₽`;
-                }
-                showMessage(msg, 'success');
-                document.getElementById('bookingForm').reset();
-                document.getElementById('timeSlots').innerHTML = '<div class="time-slot disabled">Сначала выберите дату</div>';
-                selectedTime = null;
+                // РЕДИРЕКТ НА СТРАНИЦУ СПАСИБО
+                const params = new URLSearchParams({
+                    name: name,
+                    date: date,
+                    time: selectedTime,
+                    service: service,
+                    volume: service === 'lashes' ? lashesVolume : ''
+                });
+                window.location.href = `/thankyou?${params.toString()}`;
             } else {
-                // ПРАВИЛЬНАЯ ОБРАБОТКА ОШИБКИ
                 let errorMsg = 'Неизвестная ошибка';
                 if (result.detail) {
                     errorMsg = result.detail;
