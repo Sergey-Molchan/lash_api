@@ -1,4 +1,4 @@
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from fastapi.routing import APIRoute
 from app.routers import content_upload, home_images
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +10,12 @@ from app.routers import admin, client, calendar, hours, prices, content, gallery
 import os
 
 app = FastAPI(title="Lash Studio API")
+
+for route in app.routes:
+    if isinstance(route, APIRoute) and route.path.endswith('/'):
+        continue
+    elif isinstance(route, APIRoute) and '/api/' in route.path and not route.path.endswith('/'):
+        route.path = route.path + '/'
 
 # Middleware для отключения кэширования API
 class NoCacheMiddleware(BaseHTTPMiddleware):

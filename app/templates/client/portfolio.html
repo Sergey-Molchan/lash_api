@@ -162,51 +162,51 @@
 
 <script>
     async function loadGallery() {
-        const maxRetries = 3;
-        let retries = 0;
+    const maxRetries = 3;
+    let retries = 0;
 
-        async function fetchGallery() {
-            try {
-                const res = await fetch('/api/gallery', {
-                    cache: 'no-cache',
-                    headers: { 'Cache-Control': 'no-cache' }
-                });
+    async function fetchGallery() {
+        try {
+            const res = await fetch('/api/gallery/', {  // ← ДОБАВЛЕН СЛЕШ
+                cache: 'no-cache',
+                headers: { 'Cache-Control': 'no-cache' }
+            });
 
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-                const images = await res.json();
+            const images = await res.json();
 
-                if (!images || images.length === 0) {
-                    document.getElementById('galleryGrid').innerHTML = '<p style="text-align:center; grid-column:1/-1;">Фотографии скоро появятся</p>';
-                    return;
-                }
+            if (!images || images.length === 0) {
+                document.getElementById('galleryGrid').innerHTML = '<p style="text-align:center; grid-column:1/-1;">Фотографии скоро появятся</p>';
+                return;
+            }
 
-                let html = '';
-                for (const img of images) {
-                    const imageUrl = img.url || img.image_url;
-                    const displayText = img.description || img.title || '';
-                    html += `
-                        <div class="gallery-item" onclick="openModal('${imageUrl}')">
-                            <img src="${imageUrl}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=No+Image'">
-                            <p>${escapeHtml(displayText)}</p>
-                        </div>
-                    `;
-                }
-                document.getElementById('galleryGrid').innerHTML = html;
-                console.log('✅ Портфолио загружено, фото:', images.length);
-            } catch (error) {
-                console.error(`Ошибка (попытка ${retries + 1}/${maxRetries}):`, error);
-                if (retries < maxRetries - 1) {
-                    retries++;
-                    setTimeout(fetchGallery, 2000);
-                } else {
-                    document.getElementById('galleryGrid').innerHTML = '<p style="text-align:center; grid-column:1/-1;">⚠️ Ошибка загрузки фотографий. Пожалуйста, обновите страницу.</p>';
-                }
+            let html = '';
+            for (const img of images) {
+                const imageUrl = img.url || img.image_url;
+                const displayText = img.description || img.title || '';
+                html += `
+                    <div class="gallery-item" onclick="openModal('${imageUrl}')">
+                        <img src="${imageUrl}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=No+Image'">
+                        <p>${escapeHtml(displayText)}</p>
+                    </div>
+                `;
+            }
+            document.getElementById('galleryGrid').innerHTML = html;
+            console.log('✅ Портфолио загружено, фото:', images.length);
+        } catch (error) {
+            console.error(`Ошибка (попытка ${retries + 1}/${maxRetries}):`, error);
+            if (retries < maxRetries - 1) {
+                retries++;
+                setTimeout(fetchGallery, 2000);
+            } else {
+                document.getElementById('galleryGrid').innerHTML = '<p style="text-align:center; grid-column:1/-1;">⚠️ Ошибка загрузки фотографий. Пожалуйста, обновите страницу.</p>';
             }
         }
-
-        await fetchGallery();
     }
+
+    await fetchGallery();
+}
 
     function openModal(url) {
         document.getElementById('modalImage').src = url;
