@@ -86,8 +86,7 @@
 <div id="tab-bookings" class="tab-content">
     <div style="margin-bottom:15px;">
         <button class="filter-btn active" data-status="all" onclick="filterBookings('all')">📋 Все</button>
-        <button class="filter-btn" data-status="confirmed" onclick="filterBookings('confirmed')">✅ Подтверждённые
-        </button>
+        <button class="filter-btn" data-status="confirmed" onclick="filterBookings('confirmed')">✅ Подтверждённые</button>
         <button class="filter-btn" data-status="pending" onclick="filterBookings('pending')">⏳ Ожидают</button>
         <button class="filter-btn" data-status="cancelled" onclick="filterBookings('cancelled')">❌ Отменённые</button>
     </div>
@@ -97,31 +96,13 @@
 
 <div id="tab-prices" class="tab-content">
     <h3>💰 Управление ценами</h3>
-    <div class="price-row"><span style="width:180px;">Наращивание 1D:</span><input type="number" id="priceLashes_1d"> ₽
-        <button class="btn-primary" onclick="savePrice('lashes_1d')">Сохранить</button>
-    </div>
-    <div class="price-row"><span style="width:180px;">Наращивание 1.5D:</span><input type="number"
-                                                                                     id="priceLashes_1.5d"> ₽
-        <button class="btn-primary" onclick="savePrice('lashes_1_5d')">Сохранить</button>
-    </div>
-    <div class="price-row"><span style="width:180px;">Наращивание 2D:</span><input type="number" id="priceLashes_2d"> ₽
-        <button class="btn-primary" onclick="savePrice('lashes_2d')">Сохранить</button>
-    </div>
-    <div class="price-row"><span style="width:180px;">Наращивание 3D:</span><input type="number" id="priceLashes_3d"> ₽
-        <button class="btn-primary" onclick="savePrice('lashes_3d')">Сохранить</button>
-    </div>
-    <div class="price-row"><span style="width:180px;">Ламинирование бровей:</span><input type="number" id="priceBrows">
-        ₽
-        <button class="btn-primary" onclick="savePrice('brows')">Сохранить</button>
-    </div>
-    <div class="price-row"><span style="width:180px;">Комплекс (ресницы+брови):</span><input type="number"
-                                                                                             id="priceComplex"> ₽
-        <button class="btn-primary" onclick="savePrice('complex')">Сохранить</button>
-    </div>
-    <div class="price-row"><span style="width:180px;">Предоплата (бронь):</span><input type="number" id="priceDeposit">
-        ₽
-        <button class="btn-primary" onclick="savePrice('deposit')">Сохранить</button>
-    </div>
+    <div class="price-row"><span style="width:180px;">Наращивание 1D:</span><input type="number" id="priceLashes_1d"> ₽<button class="btn-primary" onclick="savePrice('lashes_1d')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Наращивание 1.5D:</span><input type="number" id="priceLashes_1.5d"> ₽<button class="btn-primary" onclick="savePrice('lashes_1_5d')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Наращивание 2D:</span><input type="number" id="priceLashes_2d"> ₽<button class="btn-primary" onclick="savePrice('lashes_2d')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Наращивание 3D:</span><input type="number" id="priceLashes_3d"> ₽<button class="btn-primary" onclick="savePrice('lashes_3d')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Ламинирование бровей:</span><input type="number" id="priceBrows"> ₽<button class="btn-primary" onclick="savePrice('brows')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Комплекс (ресницы+брови):</span><input type="number" id="priceComplex"> ₽<button class="btn-primary" onclick="savePrice('complex')">Сохранить</button></div>
+    <div class="price-row"><span style="width:180px;">Предоплата (бронь):</span><input type="number" id="priceDeposit"> ₽<button class="btn-primary" onclick="savePrice('deposit')">Сохранить</button></div>
 </div>
 
 <div id="tab-content" class="tab-content">
@@ -131,30 +112,23 @@
     <div class="form-group"><label>О нас:</label><textarea id="about" rows="4"></textarea></div>
     <div class="form-group"><label>Адрес:</label><textarea id="address" rows="2"></textarea></div>
     <button class="btn-primary" onclick="saveContent()">💾 Сохранить все</button>
-    <div class="form-group"><label>Фото для «Наращивание ресниц» (URL)</label><input type="text" id="service_lashes_img"
-                                                                                     placeholder="/static/uploads/lashes.jpg">
+
+    <div class="form-group"><label>📸 Фото для «Наращивание ресниц»</label>
+        <input type="text" id="service_lashes_img" placeholder="/static/images/lashes.jpg">
+        <input type="file" id="uploadLashesImg" accept="image/*" style="margin-top:10px">
+        <button class="btn-primary" onclick="uploadHomeImage('lashes')">Загрузить</button>
     </div>
-    <div class="form-group"><label>Фото для «Ламинирование бровей» (URL)</label><input type="text"
-                                                                                       id="service_brows_img"
-                                                                                       placeholder="/static/uploads/brows.jpg">
+
+    <div class="form-group"><label>📸 Фото для «Ламинирование бровей»</label>
+        <input type="text" id="service_brows_img" placeholder="/static/images/brows.jpg">
+        <input type="file" id="uploadBrowsImg" accept="image/*" style="margin-top:10px">
+        <button class="btn-primary" onclick="uploadHomeImage('brows')">Загрузить</button>
     </div>
-    <div class="form-group"><label>Фото для «Комплекс» (URL)</label><input type="text" id="service_complex_img"
-                                                                           placeholder="/static/uploads/complex.jpg">
-    </div>
-    <div class="form-group">
-        <label>📸 Загрузить фото для «Наращивание ресниц»</label>
-        <input type="file" id="uploadLashesImg" accept="image/*">
-        <button class="btn-primary" onclick="uploadImageToContent('lashes')">Загрузить</button>
-    </div>
-    <div class="form-group">
-        <label>📸 Загрузить фото для «Ламинирование бровей»</label>
-        <input type="file" id="uploadBrowsImg" accept="image/*">
-        <button class="btn-primary" onclick="uploadImageToContent('brows')">Загрузить</button>
-    </div>
-    <div class="form-group">
-        <label>📸 Загрузить фото для «Комплекс»</label>
-        <input type="file" id="uploadComplexImg" accept="image/*">
-        <button class="btn-primary" onclick="uploadImageToContent('complex')">Загрузить</button>
+
+    <div class="form-group"><label>📸 Фото для «Комплекс»</label>
+        <input type="text" id="service_complex_img" placeholder="/static/images/complex.jpg">
+        <input type="file" id="uploadComplexImg" accept="image/*" style="margin-top:10px">
+        <button class="btn-primary" onclick="uploadHomeImage('complex')">Загрузить</button>
     </div>
 </div>
 
@@ -169,7 +143,7 @@
         <input type="text" id="imageTitle" style="width:100%; margin-bottom:10px;">
         <label>Описание (необязательно):</label>
         <textarea id="imageDescription" rows="2" style="width:100%;"></textarea>
-        <button class="btn-primary" onclick="uploadWithDetails()">📤 Загрузить с описанием</button>
+        <button class="btn-primary" onclick="uploadWithDetails()">📤 Загрузить</button>
     </div>
     <div id="gallery-list" class="gallery-grid"></div>
 </div>
@@ -194,22 +168,13 @@
         </select>
         <label for="financeMonthSelect" style="margin-left:15px;">Месяц: </label>
         <select id="financeMonthSelect" onchange="loadFinance()">
-            <option value="1">Январь</option>
-            <option value="2">Февраль</option>
-            <option value="3">Март</option>
-            <option value="4">Апрель</option>
-            <option value="5">Май</option>
-            <option value="6">Июнь</option>
-            <option value="7">Июль</option>
-            <option value="8">Август</option>
-            <option value="9">Сентябрь</option>
-            <option value="10">Октябрь</option>
-            <option value="11">Ноябрь</option>
-            <option value="12">Декабрь</option>
+            <option value="1">Январь</option><option value="2">Февраль</option><option value="3">Март</option>
+            <option value="4">Апрель</option><option value="5">Май</option><option value="6">Июнь</option>
+            <option value="7">Июль</option><option value="8">Август</option><option value="9">Сентябрь</option>
+            <option value="10">Октябрь</option><option value="11">Ноябрь</option><option value="12">Декабрь</option>
         </select>
         <button class="btn-primary" onclick="loadFinance()">Показать</button>
-        <button class="btn-secondary" onclick="loadMonthlyStats()" style="margin-left:10px;">📈 Годовая статистика
-        </button>
+        <button class="btn-secondary" onclick="loadMonthlyStats()" style="margin-left:10px;">📈 Годовая статистика</button>
     </div>
     <div id="financeStats"></div>
     <div id="financeDetails"></div>
@@ -285,7 +250,7 @@
                     <button class="btn-info" onclick="sendNotification(${b.id}, 'booking_reminder')">⏰ Напом</button>
                  </td>
                 <td><button class="btn-success" onclick="confirmBooking(${b.id})">✅</button><button class="btn-danger" onclick="cancelBooking(${b.id})">❌</button><button class="btn-warning" onclick="deleteBooking(${b.id})">🗑️</button></td>
-             </tr>`;
+             </td>`;
         }
         html += '</tbody></table>';
         document.getElementById('bookings-container').innerHTML = html;
@@ -368,38 +333,19 @@
             'complex': 'priceComplex',
             'deposit': 'priceDeposit'
         };
-
         priceInput = document.getElementById(serviceMap[service]);
-
-        if (!priceInput) {
-            alert('Ошибка: поле не найдено для ' + service);
-            return;
-        }
-
+        if (!priceInput) { alert('Ошибка: поле не найдено'); return; }
         const price = parseInt(priceInput.value);
-        if (isNaN(price)) {
-            alert('Введите корректную цену');
-            return;
-        }
-
+        if (isNaN(price)) { alert('Введите корректную цену'); return; }
         try {
             const response = await fetch('/api/prices/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ service: service, price: price })
             });
-
-            if (response.ok) {
-                alert('✅ Цена сохранена');
-                loadPrices();
-            } else {
-                const error = await response.json();
-                alert('❌ Ошибка: ' + (error.detail || 'Неизвестная ошибка'));
-            }
-        } catch(e) {
-            console.error('Ошибка:', e);
-            alert('❌ Ошибка соединения');
-        }
+            if (response.ok) { alert('✅ Цена сохранена'); loadPrices(); }
+            else { alert('❌ Ошибка сохранения'); }
+        } catch(e) { alert('❌ Ошибка соединения'); }
     }
 
     async function loadContent() {
@@ -430,8 +376,7 @@
         const images = await res.json();
         let html = '';
         for (const img of images) {
-            const displayText = img.description || img.title || '';
-            html += `<div class="gallery-item"><img src="${img.url}" onerror="this.src='https://via.placeholder.com/150'"><p>${escapeHtml(displayText)}</p><button class="delete-img" onclick="deleteImage(${img.id})">✖</button></div>`;
+            html += `<div class="gallery-item"><img src="${img.url}" onerror="this.src='https://via.placeholder.com/150'"><p>${escapeHtml(img.description || img.title || '')}</p><button class="delete-img" onclick="deleteImage(${img.id})">✖</button></div>`;
         }
         document.getElementById('gallery-list').innerHTML = html || '<p>Нет фото</p>';
     }
@@ -446,13 +391,8 @@
         if (title) formData.append('title', title);
         if (description) formData.append('description', description);
         const res = await fetch('/api/gallery/upload', { method: 'POST', body: formData });
-        if (res.ok) {
-            alert('✅ Фото загружено');
-            document.getElementById('imageTitle').value = '';
-            document.getElementById('imageDescription').value = '';
-            fileInput.value = '';
-            loadGallery();
-        } else { alert('❌ Ошибка загрузки'); }
+        if (res.ok) { alert('✅ Фото загружено'); loadGallery(); }
+        else { alert('❌ Ошибка загрузки'); }
     }
 
     async function deleteImage(id) {
@@ -516,12 +456,12 @@
                 <div class="finance-stat"><h3>💵 Средний чек</h3><div class="value">${Math.round(data.total_amount / data.total_bookings || 0).toLocaleString()} ₽</div></div>
             </div>
         `;
-        let detailsHtml = '<h4 style="margin-top:20px">📋 Детали по услугам:</h4><table class="bookings-table"><thead><tr><th>Услуга</th><th>Количество</th><th>Выручка</th></tr></thead><tbody>';
+        let detailsHtml = '<h4>📋 Детали по услугам:</h4><table class="bookings-table"><thead><tr><th>Услуга</th><th>Количество</th><th>Выручка</th></tr></thead><tbody>';
         for (const [key, service] of Object.entries(data.service_stats)) {
             detailsHtml += `<tr><td>${service.name}</td><td>${service.count} шт</td><td>${service.total.toLocaleString()} ₽</td></tr>`;
         }
         if (data.volume_stats) {
-            detailsHtml += '<h4 style="margin-top:20px">📊 По объёмам ресниц:</h4><table class="bookings-table"><thead><tr><th>Объём</th><th>Количество</th><th>Выручка</th></tr></thead><tbody>';
+            detailsHtml += '<h4>📊 По объёмам ресниц:</h4><table class="bookings-table"><thead><tr><th>Объём</th><th>Количество</th><th>Выручка</th></tr></thead><tbody>';
             for (const [key, vol] of Object.entries(data.volume_stats)) {
                 if (vol.count > 0) {
                     detailsHtml += `<tr><td>${vol.name}</td><td>${vol.count} шт</td><td>${vol.total.toLocaleString()} ₽</td></tr>`;
@@ -537,16 +477,12 @@
         const res = await fetch('/api/finance/monthly');
         const data = await res.json();
         if (!data.months.length) {
-            document.getElementById('monthlyChart').innerHTML = '<p>Нет данных для отображения</p>';
+            document.getElementById('monthlyChart').innerHTML = '<p>Нет данных</p>';
             return;
         }
-        let html = '<h4>📈 Помесячная статистика</h4><table class="bookings-table"><thead><tr><th>Месяц</th><th>Количество записей</th><th>Выручка</th></tr></thead><tbody>';
+        let html = '<h4>📈 Помесячная статистика</h4><table class="bookings-table"><thead><tr><th>Месяц</th><th>Количество</th><th>Выручка</th></tr></thead><tbody>';
         for (let i = 0; i < data.months.length; i++) {
-            html += `<tr>
-                <td>${data.months[i]}</td>
-                <td>${data.counts[i]} шт</td>
-                <td>${data.revenues[i].toLocaleString()} ₽</td>
-            </tr>`;
+            html += `<tr><td>${data.months[i]}</td><td>${data.counts[i]} шт</td><td>${data.revenues[i].toLocaleString()} ₽</td></tr>`;
         }
         html += '</tbody></table>';
         document.getElementById('monthlyChart').innerHTML = html;
@@ -559,44 +495,23 @@
         return div.innerHTML;
     }
 
-    async function uploadImageToContent(type) {
+    async function uploadHomeImage(section) {
         let fileInput = null;
         let fieldId = null;
-
-        if (type === 'lashes') {
-            fileInput = document.getElementById('uploadLashesImg');
-            fieldId = 'service_lashes_img';
-        } else if (type === 'brows') {
-            fileInput = document.getElementById('uploadBrowsImg');
-            fieldId = 'service_brows_img';
-        } else if (type === 'complex') {
-            fileInput = document.getElementById('uploadComplexImg');
-            fieldId = 'service_complex_img';
-        }
-
-        if (!fileInput.files || !fileInput.files.length) {
-            alert('Выберите файл');
-            return;
-        }
-
+        if (section === 'lashes') { fileInput = document.getElementById('uploadLashesImg'); fieldId = 'service_lashes_img'; }
+        else if (section === 'brows') { fileInput = document.getElementById('uploadBrowsImg'); fieldId = 'service_brows_img'; }
+        else if (section === 'complex') { fileInput = document.getElementById('uploadComplexImg'); fieldId = 'service_complex_img'; }
+        if (!fileInput.files || !fileInput.files.length) { alert('Выберите файл'); return; }
         const formData = new FormData();
         formData.append('file', fileInput.files[0]);
-
         try {
-            const res = await fetch('/api/content-upload/', {
-                method: 'POST',
-                body: formData
-            });
+            const res = await fetch(`/api/home-images/upload/${section}`, { method: 'POST', body: formData });
             const data = await res.json();
             if (res.ok) {
                 document.getElementById(fieldId).value = data.url;
-                alert('✅ Фото загружено! Не забудьте нажать "Сохранить все"');
-            } else {
-                alert('❌ Ошибка загрузки');
-            }
-        } catch(e) {
-            alert('❌ Ошибка соединения');
-        }
+                alert('✅ Фото загружено!');
+            } else { alert('❌ Ошибка загрузки'); }
+        } catch(e) { alert('❌ Ошибка соединения'); }
     }
 
     loadCalendar();

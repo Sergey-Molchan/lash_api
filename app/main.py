@@ -1,4 +1,4 @@
-from app.routers import content_upload
+from app.routers import content_upload, home_images
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -32,6 +32,7 @@ app.include_router(comments.router)
 app.include_router(finance.router)
 app.include_router(notifications.router)
 app.include_router(content_upload.router)
+app.include_router(home_images.router)
 
 def read_html(filepath):
     with open(filepath, "r", encoding="utf-8") as f:

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Float
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Float, LargeBinary
 from datetime import datetime
 from app.database import Base
 
@@ -42,13 +42,6 @@ class SiteContent(Base):
     section = Column(String(50), nullable=False, unique=True)
     content = Column(Text, nullable=False)
 
-class GalleryImage(Base):
-    __tablename__ = "gallery_images"
-    id = Column(Integer, primary_key=True, index=True)
-    url = Column(String(500), nullable=False)
-    title = Column(String(200), nullable=True)
-    description = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.now)
 
 class Comment(Base):
     __tablename__ = "comments"
@@ -60,3 +53,23 @@ class Comment(Base):
     emoji = Column(String(10), default="😊")
     is_approved = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.now)
+
+
+class GalleryImage(Base):
+    __tablename__ = "gallery_images"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(200), nullable=True)
+    description = Column(Text, nullable=True)
+    image_data = Column(LargeBinary, nullable=False)  # ← само фото в БД
+    filename = Column(String(255), nullable=True)
+    content_type = Column(String(100), nullable=True)
+    created_at = Column(DateTime, default=datetime.now)
+
+
+class HomeImage(Base):
+    __tablename__ = "home_images"
+    id = Column(Integer, primary_key=True, index=True)
+    section = Column(String(50), unique=True, nullable=False)  # 'lashes', 'brows', 'complex'
+    image_data = Column(LargeBinary, nullable=False)
+    content_type = Column(String(100), nullable=True)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
